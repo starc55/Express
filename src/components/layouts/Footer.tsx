@@ -1,37 +1,26 @@
 import React from "react";
 import { motion } from "framer-motion";
 import styles from "@/styles/layouts/footer.module.css";
-import logo from "@/assets/images/logo.png";
+import logo from "@/assets/images/logo.svg";
+import { FiPhone } from "react-icons/fi";
+import { MdOutlineEmail } from "react-icons/md";
+import { IoLocationOutline } from "react-icons/io5";
+
+import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
+import { FaInstagram, FaFacebookF, FaYoutube } from "react-icons/fa";
 
 const footerVariants = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.8,
-      ease: "easeOut" as const,
-      when: "beforeChildren",
-      staggerChildren: 0.14,
-    },
+    transition: { duration: 0.7, ease: "easeOut", staggerChildren: 0.12 },
   },
-};
+} as const;
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut" as const },
-  },
-};
-
-const linkVariants = {
-  rest: { y: 0 },
-  hover: {
-    y: -3,
-    transition: { duration: 0.3, ease: "easeOut" as const },
-  },
+  hidden: { opacity: 0, y: 15 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
 const Footer: React.FC = () => {
@@ -42,63 +31,90 @@ const Footer: React.FC = () => {
       className={styles.footer}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-100px" }}
+      viewport={{ once: true, margin: "-80px" }}
       variants={footerVariants}
     >
       <div className={styles.container}>
-        <div className={styles.topSection}>
-          <motion.div className={styles.logoSection} variants={itemVariants}>
-            <img src={logo} alt="" className={styles.footerImg} />
-            <div className={styles.navigato}>Navigato</div>
+        <div className={styles.top}>
+          <motion.div className={styles.logoBlock} variants={itemVariants}>
+            <img
+              src={logo}
+              alt="Xpress Auto Transportation Logo"
+              className={styles.logoImg}
+            />
           </motion.div>
 
-          <motion.div className={styles.contactColumn} variants={itemVariants}>
+          <motion.div className={styles.contact} variants={itemVariants}>
             <div className={styles.contactItem}>
-              <span className={styles.label}>Phone number:</span>
-              <strong className={styles.value}>+998 90 000 00 00</strong>
+              <FiPhone className={styles.icon} />
+              <a href="tel:+19295665040" className={styles.value}>
+                +1 (929) 566-5040
+              </a>
             </div>
+
             <div className={styles.contactItem}>
-              <span className={styles.label}>Address:</span>
-              <strong className={styles.value}>Name of address</strong>
+              <MdOutlineEmail className={styles.icon} />
+              <a
+                href="mailto:info@xpresstransportation.org"
+                className={styles.value}
+              >
+                info@xpresstransportation.org
+              </a>
             </div>
+
+            <div className={styles.contactItem}>
+              <IoLocationOutline className={styles.icon} />
+              <address className={styles.value}>
+                3073 Allendale Dr, Indian Land, SC 29707, USA
+              </address>
+            </div>
+          </motion.div>
+
+          <motion.div className={styles.social} variants={itemVariants}>
+            <a
+              href="https://www.instagram.com/xpressautotransportation/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className={styles.socialLink}
+            >
+              <FaInstagram className={styles.socialIcon} />
+            </a>
+
+            <a
+              href="https://www.facebook.com/xpressautotransportation/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              className={styles.socialLink}
+            >
+              <FaFacebookF className={styles.socialIcon} />
+            </a>
+
+            <a
+              href="https://www.youtube.com/@XpressAutoTransportationInc/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube"
+              className={styles.socialLink}
+            >
+              <FaYoutube className={styles.socialIcon} />
+            </a>
           </motion.div>
         </div>
 
-        <motion.div className={styles.bottomSection} variants={itemVariants}>
-          <span className={styles.year}>
-            © {currentYear} Untitled UI. All rights reserved
+        <motion.div className={styles.bottom} variants={itemVariants}>
+          <span className={styles.copyright}>
+            © {currentYear} Xpress Auto Transportation Inc. All rights reserved.
           </span>
 
-          <div className={styles.links}>
-            <motion.a
-              href="#"
-              className={styles.link}
-              variants={linkVariants}
-              initial="rest"
-              whileHover="hover"
-            >
-              Terms
-            </motion.a>
-
-            <motion.a
-              href="#"
-              className={styles.link}
-              variants={linkVariants}
-              initial="rest"
-              whileHover="hover"
-            >
-              Privacy
-            </motion.a>
-
-            <motion.a
-              href="#"
-              className={styles.link}
-              variants={linkVariants}
-              initial="rest"
-              whileHover="hover"
-            >
-              Cookies
-            </motion.a>
+          <div className={styles.legalLinks}>
+            <a href="/terms-and-conditions" className={styles.link}>
+              Terms & Conditions
+            </a>
+            <a href="/privacy-policy" className={styles.link}>
+              Privacy Policy
+            </a>
           </div>
         </motion.div>
       </div>
