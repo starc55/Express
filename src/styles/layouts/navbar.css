@@ -1,0 +1,112 @@
+.navbar-container {
+    position: relative;
+    top: 20px;
+    width: 90%;
+    max-width: 1100px;
+    height: 70px;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    background-color: #F5F5F5;
+    border-radius: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.navbar-logo {
+    background-color: silver;
+    border-radius: 8px;
+    width: 90px;
+    height: 30px;
+}
+
+.navbar-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.navbar-container span {
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.navbar-button {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background-color: #FF4E00;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 40px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.navbar-button:hover {
+    background-color: #E04300;
+}
+
+.navbar-container.visible {
+    transform: translateY(0);
+}
+
+.navbar-container.hidden {
+    transform: translateY(-100%);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+    min-width: 200px;
+    overflow: hidden;
+    margin-top: 12px;
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+
+.dropdown-item {
+    width: 100%;
+    padding: 1rem 1rem;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.98rem;
+    color: #1f2937;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(to right, #fff8f0, #feeee0);
+    transform: translateX(4px);
+    color: #FF4E00;
+}
+
+.logout {
+    color: #ef4444;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 1rem;
+}
+
+.logout:hover {
+    background: linear-gradient(to right, #ffecec, #fecaca);
+    color: #dc2626;
+}

@@ -1,0 +1,147 @@
+.footer {
+    background-color: #244567;
+    color: white;
+    padding: 2rem 0 2rem;
+    font-family: 'Montserrat', sans-serif;
+    margin-top: 5rem;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.topSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.logoSection {
+    flex-shrink: 0;
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: left;
+}
+
+.footerImg {
+    width: 170px;
+    text-align: left;
+    position: relative;
+    left: -2.5rem;
+}
+
+.contactColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-width: 300px;
+    text-align: right;
+}
+
+.contactItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.label {
+    font-size: 12px;
+    color: #A4A7AE;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.value {
+    font-size: 1.125rem;
+    color: white;
+    font-weight: 600;
+}
+
+.bottomSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 2.5rem;
+    border-top: 1px solid #334155;
+    gap: 1.5rem;
+}
+
+.navigato {
+    font-size: 13px;
+    font-weight: 500;
+    color: white;
+}
+
+
+
+.year {
+    font-size: 0.95rem;
+    color: white;
+}
+
+.links {
+    display: flex;
+    align-items: right;
+    gap: 2rem;
+}
+
+.link {
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.link:hover {
+    color: #FF4E00;
+}
+
+
+@media (max-width: 1024px) {
+    .topSection {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 2rem;
+    }
+
+    .footerImg {
+        left: 0;
+    }
+
+    .contactColumn {
+        text-align: center;
+        min-width: auto;
+    }
+
+    .bottomSection {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .container {
+        padding: 0 1.5rem;
+    }
+
+    .logo {
+        font-size: 2.25rem;
+    }
+
+    .links {
+        order: 2;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}

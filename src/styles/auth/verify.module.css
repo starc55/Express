@@ -1,0 +1,101 @@
+.backHomeWrapper {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+}
+
+.backHome {
+    cursor: pointer;
+    color: #333;
+}
+
+.loginContainer {
+    max-width: 420px;
+    margin: 4rem auto;
+    padding: 2.5rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.logoImage {
+    height: 60px;
+    width: auto;
+}
+
+.subtitle {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.verifyInfo {
+    text-align: center;
+    color: #666;
+    margin: 0.5rem 0 1.8rem;
+    font-size: 0.95rem;
+}
+
+.inputFields {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.inputGroup label {
+    font-weight: 500;
+    color: #444;
+}
+
+.inputGroup input {
+    padding: 0.9rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+.codeInput {
+    letter-spacing: 0.8rem;
+    text-align: center;
+    font-size: 1.5rem !important;
+    padding: 1rem !important;
+}
+
+.verifyFooter {
+    margin-top: 1.2rem;
+    text-align: center;
+}
+
+.resendLink {
+    color: #0066cc;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.resendLink:hover {
+    text-decoration: underline;
+}
+
+.submitButton {
+    margin-top: 1.8rem;
+    width: 100%;
+    padding: 1rem;
+    background: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+}

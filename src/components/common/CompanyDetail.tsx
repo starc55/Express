@@ -1,0 +1,539 @@
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { CiStar } from "react-icons/ci";
+import { BsCheckCircle } from "react-icons/bs";
+import Footer from "@/components/layouts/Footer";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import axiosInstance from "@/api/axiosInstance";
+import styles from "@/styles/common/companyDetail.module.css";
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: "easeOut" as const },
+  },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 1 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.14,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.65, ease: "easeOut" as const },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" as const },
+  },
+};
+
+const starVariants = {
+  hidden: { opacity: 0, scale: 0.6 },
+  visible: (i: number) => ({
+    opacity: 1,
+    scale: 1,
+    transition: {
+      delay: i * 0.08,
+      type: "spring" as const,
+      stiffness: 280,
+      damping: 14,
+    },
+  }),
+};
+
+const barVariants = {
+  hidden: { width: 0 },
+  visible: (percent: number) => ({
+    width: `${percent}%`,
+    transition: { duration: 1.2, ease: "easeOut" as const },
+  }),
+};
+
+const checkVariants = {
+  hidden: { scale: 0, opacity: 0 },
+  visible: {
+    scale: 1,
+    opacity: 1,
+    transition: { type: "spring" as const, stiffness: 300, damping: 20 },
+  },
+};
+
+export default function CompanyDetail() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [company, setCompany] = useState<any>(null);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCompany = async () => {
+      if (!id) return;
+
+      const loadingToast = toast.loading("Loading company details...");
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const companyRes = await axiosInstance.get(
+          `/api/v1/company/detail/${id}/`
+        );
+        setCompany(companyRes.data);
+
+        const reviewsRes = await axiosInstance.get("/api/v1/reviews/", {
+          params: {
+            company: id,
+            page_size: 50,
+            ordering: "-created_at",
+          },
+        });
+        setReviews(reviewsRes.data.results || reviewsRes.data || []);
+
+        toast.success("Loaded successfully", { id: loadingToast });
+      } catch (err: any) {
+        console.error("Error loading company or reviews:", err);
+        toast.error("Failed to load company details", { id: loadingToast });
+        setError("Company details could not be loaded. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompany();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className={styles.loading}
+      >
+        Loading...
+      </motion.div>
+    );
+  }
+
+  if (error || !company) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className={styles.notFound}
+      >
+        <h2>404 - Company not found</h2>
+        <button type="button" onClick={() => navigate("/")}>
+          Back to home
+        </button>
+      </motion.div>
+    );
+  }
+
+  const reviewCount = reviews.length;
+
+  let overallRating = "N/A";
+  let avgTimeliness = "N/A";
+  let avgCommunication = "N/A";
+  let avgDocumentation = "N/A";
+  let paymentsMet = 0;
+  let wouldWorkAgain = 0;
+  let vehicleCondition = 0;
+
+  if (reviewCount > 0) {
+    let totalTimeliness = 0;
+    let totalCommunication = 0;
+    let totalDocumentation = 0;
+    let metCount = 0;
+    let againCount = 0;
+    let expectedCount = 0;
+
+    reviews.forEach((r) => {
+      totalTimeliness += r.timeliness || 0;
+      totalCommunication += r.communication || 0;
+      totalDocumentation += r.documentation || 0;
+      if (r.payment_terms_met) metCount++;
+      if (r.would_work_again) againCount++;
+      if (r.vehicle_delivered_expected) expectedCount++;
+    });
+
+    const avg =
+      (totalTimeliness + totalCommunication + totalDocumentation) /
+      (reviewCount * 3);
+    overallRating = avg.toFixed(1);
+
+    avgTimeliness = (totalTimeliness / reviewCount).toFixed(1);
+    avgCommunication = (totalCommunication / reviewCount).toFixed(1);
+    avgDocumentation = (totalDocumentation / reviewCount).toFixed(1);
+
+    paymentsMet = Math.round((metCount / reviewCount) * 100);
+    wouldWorkAgain = Math.round((againCount / reviewCount) * 100);
+    vehicleCondition = Math.round((expectedCount / reviewCount) * 100);
+  }
+
+  const renderStars = (rating: number | string) => {
+    if (typeof rating === "string") return <span>N/A</span>;
+
+    return [...Array(5)].map((_, i) => (
+      <motion.div
+        key={i}
+        custom={i}
+        variants={starVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <CiStar
+          size={24}
+          className={
+            i < Math.floor(Number(rating))
+              ? styles.starFilled
+              : styles.starEmpty
+          }
+        />
+      </motion.div>
+    ));
+  };
+
+  return (
+    <motion.div
+      className={styles.pageWrapper}
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <main className={styles.main}>
+        <div className={styles.container}>
+          <motion.button
+            type="button"
+            className={styles.backButton}
+            onClick={() => navigate(-1)}
+            whileHover={{ scale: 1.04, x: -4 }}
+            whileTap={{ scale: 0.96 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          >
+            Back
+          </motion.button>
+
+          <motion.h1
+            className={styles.pageTitle}
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {company.name}
+          </motion.h1>
+
+          <motion.div
+            className={styles.ratingCard}
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <div className={styles.overallSection}>
+              <p className={styles.overallLabel}>Overall Rating Average</p>
+              <div className={styles.overallNumber}>{overallRating}</div>
+              <div className={styles.starsContainer}>
+                {renderStars(overallRating)}
+              </div>
+              <p className={styles.reviewCount}>
+                {reviewCount} review{reviewCount !== 1 ? "s" : ""}
+              </p>
+            </div>
+
+            <div className={styles.barSection}>
+              {([5, 4, 3, 2, 1] as const).map((stars) => {
+                const widths = [95, 4, 1, 0, 0];
+                return (
+                  <div key={stars} className={styles.barRow}>
+                    <span>{stars}</span>
+                    <div className={styles.bar}>
+                      <motion.div
+                        className={styles.barFill}
+                        custom={widths[5 - stars]}
+                        variants={barVariants}
+                        initial="hidden"
+                        animate="visible"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className={styles.detailSection}>
+              <p className={styles.detailLabel}>Avg. Detail Rating</p>
+
+              <motion.div
+                className={styles.detailRatingsGrid}
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+              >
+                {[
+                  { label: "Timeliness", value: avgTimeliness },
+                  { label: "Communication", value: avgCommunication },
+                  { label: "Documentation", value: avgDocumentation },
+                ].map((item) => (
+                  <motion.div
+                    key={item.label}
+                    className={styles.detailItem}
+                    variants={itemVariants}
+                  >
+                    <span className={styles.detailLabelText}>{item.label}</span>
+                    <div className={styles.starWithNumber}>
+                      <span className={styles.starIcon}>★</span>
+                      <span className={styles.starNumber}>{item.value}</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              <motion.div
+                className={styles.statsList}
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+              >
+                <motion.p variants={itemVariants}>
+                  {paymentsMet}% Payments terms met
+                </motion.p>
+                <motion.p variants={itemVariants}>
+                  {wouldWorkAgain}% Would work again
+                </motion.p>
+                <motion.p variants={itemVariants}>
+                  {vehicleCondition}% Vehicle delivered in expected conditions
+                </motion.p>
+              </motion.div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className={styles.infoGrid}
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div className={styles.infoCard} variants={cardVariants}>
+              <h3 className={styles.cardTitle}>FMCSA Verification Checklist</h3>
+
+              <div className={styles.checklistGrid}>
+                {[
+                  {
+                    label: "Allowed to operate",
+                    value: company.allowed_to_operate ? "Yes" : "No",
+                  },
+                  {
+                    label: "Business type",
+                    value: company.business_type || "N/A",
+                  },
+                  {
+                    label: "MCS 150 Outdated",
+                    value: company.mcs_150_outdated ? "Yes" : "No",
+                  },
+                  { label: "USDOT#", value: company.usdot || "N/A" },
+                  {
+                    label: "Business Address",
+                    value: company.business_address || "N/A",
+                  },
+                  {
+                    label: "Out of Service Date",
+                    value: company.out_of_service_date || "None",
+                  },
+                  { label: "MC#", value: company.mc_number || "N/A" },
+                  {
+                    label: "Carrier Operation",
+                    value: company.carrier_operation || "N/A",
+                  },
+                ].map((item) => (
+                  <motion.div
+                    key={item.label}
+                    className={styles.gridItem}
+                    variants={itemVariants}
+                  >
+                    <div className={styles.checkLabel}>{item.label}</div>
+                    <div className={styles.checkValue}>
+                      <motion.div
+                        variants={checkVariants}
+                        initial="hidden"
+                        animate="visible"
+                      >
+                        <BsCheckCircle className={styles.checkIcon} size={18} />
+                      </motion.div>
+                      <span>{item.value}</span>
+                    </div>
+                  </motion.div>
+                ))}
+
+                <div className={styles.authorityRow}>
+                  <div className={styles.checkLabelFull}>
+                    <motion.div
+                      variants={checkVariants}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      <BsCheckCircle className={styles.checkIcon} size={18} />
+                    </motion.div>
+                    Authority Status
+                  </div>
+                  <div className={styles.authorityTags}>
+                    <span className={styles.tag}>
+                      {company.authority_status || "N/A"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div className={styles.infoCard} variants={cardVariants}>
+              <h3 className={styles.cardTitle}>Cargo insurance</h3>
+              <div className={styles.cargoList}>
+                {[
+                  {
+                    label: "Insurance company",
+                    value: company.insurance_company || "N/A",
+                  },
+                  {
+                    label: "Physical Damage Limit",
+                    value: company.physical_damage_limit || "-",
+                  },
+                  { label: "Agent", value: company.insurance_agent || "N/A" },
+                  {
+                    label: "Insurance Deductible",
+                    value: company.insurance_deductible || "-",
+                  },
+                  {
+                    label: "Phone number",
+                    value: company.insurance_phone || "N/A",
+                  },
+                ].map((item) => (
+                  <motion.div
+                    key={item.label}
+                    className={styles.cargoItem}
+                    variants={itemVariants}
+                  >
+                    <span className={styles.checkLabel}>{item.label}</span>
+                    <span className={styles.checkValue}>{item.value}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div className={styles.infoCard} variants={cardVariants}>
+              <h3 className={styles.cardTitle}>Equipment route</h3>
+              <div className={styles.routeList}>
+                {[
+                  {
+                    label: "# of Trucks",
+                    value: company.number_of_trucks ?? "--",
+                  },
+                  {
+                    label: "Equipment Description",
+                    value: company.equipment_description || "--",
+                  },
+                  {
+                    label: "Route description",
+                    value: company.route_description || "--",
+                  },
+                ].map((item) => (
+                  <motion.div
+                    key={item.label}
+                    className={styles.routeItem}
+                    variants={itemVariants}
+                  >
+                    <span className={styles.checkLabel}>{item.label}</span>
+                    <span className={styles.checkValue}>{item.value}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+
+          <motion.div
+            className={styles.reviewsSection}
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <h2 className={styles.sectionTitle}>Reviews</h2>
+
+            {reviews.length === 0 ? (
+              <p className={styles.noReviews}>No reviews yet</p>
+            ) : (
+              reviews.map((review) => (
+                <motion.div
+                  key={review.id}
+                  className={styles.reviewCard}
+                  variants={itemVariants}
+                >
+                  <div className={styles.reviewHeader}>
+                    <div className={styles.reviewerInfo}>
+                      <div className={styles.reviewerAvatar}>
+                        {review.reviewer_name?.[0]?.toUpperCase() || "?"}
+                      </div>
+                      <div>
+                        <h4 className={styles.reviewerName}>
+                          {review.reviewer_name || "Anonymous"}
+                        </h4>
+                        <span className={styles.reviewDate}>
+                          {new Date(review.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={styles.reviewRating}>
+                      {(
+                        (review.timeliness +
+                          review.communication +
+                          review.documentation) /
+                        3
+                      ).toFixed(1)}
+                      <CiStar size={18} />
+                    </div>
+                  </div>
+
+                  <p className={styles.reviewText}>{review.comment}</p>
+
+                  <div className={styles.reviewMeta}>
+                    <span>
+                      {review.payment_terms_met ? "✓" : "✗"} Payment terms met
+                    </span>
+                    <span>
+                      {review.would_work_again ? "✓" : "✗"} Would work again
+                    </span>
+                    <span>
+                      {review.vehicle_delivered_expected ? "✓" : "✗"} Delivered
+                      as expected
+                    </span>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </motion.div>
+        </div>
+      </main>
+
+      <Footer />
+    </motion.div>
+  );
+}

@@ -1,0 +1,241 @@
+.header {
+    position: relative;
+    width: 90%;
+    max-width: 1100px;
+    height: 85vh;
+    max-height: 600px;
+    margin: 3rem auto 80px auto;
+    border-radius: 36px;
+    z-index: 10;
+}
+
+.hero {
+    position: absolute;
+    inset: 0;
+    background: url("../../assets/images/header.png") center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 36px;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom,
+            rgba(0, 0, 0, 0.35) 0%,
+            rgba(0, 0, 1, 0.329) 60%,
+            rgba(0, 0, 4, 0.75) 100%);
+    border-radius: 36px;
+}
+
+.input::placeholder {
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.content {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 2;
+    color: white;
+    max-width: 900px;
+    padding: 0 20px;
+}
+
+.title {
+    font-size: clamp(2.8rem, 7vw, 50px);
+    font-weight: 600;
+    line-height: 1.05;
+    margin-bottom: 1rem;
+}
+
+.subtitle {
+    font-size: clamp(1.1rem, 3vw, 18px);
+    font-weight: 400;
+    opacity: 0.95;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.searchContainer {
+    position: absolute;
+    bottom: 1rem;
+    z-index: 3;
+    width: 90%;
+    max-width: 1100px;
+    padding: 0 20px;
+}
+
+.searchBar {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    align-items: flex-end;
+    gap: 1.4rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
+
+.searchBar::-webkit-scrollbar {
+    display: none;
+}
+
+.searchBar * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.searchBar *::-webkit-scrollbar {
+    display: none;
+}
+
+.inputWrapper {
+    position: relative;
+    flex: 1;
+    min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.fieldLabel {
+    position: absolute;
+    top: -0.4rem;
+    left: 12px;
+    background: white;
+    padding: 0 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4b5563;
+    pointer-events: none;
+    z-index: 2;
+    white-space: nowrap;
+}
+
+.inputGroup {
+    position: relative;
+}
+
+.input {
+    width: 100%;
+    padding: 0.9rem 0.5rem 0.9rem 2.8rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    height: 46px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    background-color: #F2F2F2;
+    border-radius: 50%;
+    pointer-events: none;
+    padding: 1px;
+}
+
+.select {
+    width: 100%;
+    height: 46px;
+    padding: 0.9rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.95rem;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='gray' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    background-size: 12px;
+}
+
+.searchBtn {
+    background-color: #FF4E00;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.9rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    min-width: 120px;
+    height: 46px;
+    transition: background-color 0.3s ease;
+}
+
+.searchBtn:hover {
+    background-color: #e04300;
+}
+
+@media (min-width: 1025px) {
+    .searchBar {
+        flex-wrap: nowrap;
+    }
+
+    .inputWrapper {
+        flex: 1 1 0;
+        min-width: 160px;
+    }
+
+    .searchBtn {
+        flex-shrink: 0;
+        min-width: 140px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .searchBar {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 12px;
+        padding: 1rem 1.2rem;
+        justify-content: flex-start;
+    }
+
+    .inputWrapper {
+        flex: 0 0 auto;
+        min-width: 140px;
+        max-width: 180px;
+    }
+
+    .searchBtn {
+        flex: 0 0 auto;
+        min-width: 110px;
+    }
+
+    .fieldLabel {
+        top: -0.7rem;
+        font-size: 0.68rem;
+    }
+
+    .searchBar::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .searchBar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .searchBar::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+
+    .searchBar::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+}

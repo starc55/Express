@@ -1,0 +1,576 @@
+.pageWrapper {
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+.main {
+    padding: 1.5rem 1rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.backButton {
+    background: none;
+    padding: 0.5rem 1.5rem;
+    border: 1px solid #D5D7DA;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+        0 1px 2px rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    color: #414651;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.backButton:hover {
+    background: #f8f9fa;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-color: #c1c4cb;
+}
+
+.pageTitle {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #000000;
+}
+
+.ratingCard {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.overallSection {
+    text-align: center;
+}
+
+.overallLabel {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1C1917;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.overallNumber {
+    font-size: 4.5rem;
+    font-weight: 700;
+    color: #000000;
+    line-height: 1;
+    margin: 0.5rem 0;
+}
+
+.starsContainer {
+    display: flex;
+    justify-content: center;
+    gap: 0.3rem;
+    margin: 0.75rem 0;
+}
+
+.starFilled {
+    color: #FBB129;
+    fill: #FBB129;
+}
+
+.starEmpty {
+    color: #d1d5db;
+}
+
+.reviewCount {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #000000;
+    margin-top: 0.5rem;
+}
+
+.barSection {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.barRow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0.6rem 0;
+}
+
+.barRow span {
+    width: 20px;
+    text-align: right;
+    font-size: 1rem;
+    color: #333333;
+    font-weight: 500;
+}
+
+.bar {
+    flex: 1;
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.barFill {
+    height: 100%;
+    background: #FBB129;
+    border-radius: 9999px;
+    transition: width 0.5s ease;
+}
+
+
+
+.detailLabel {
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+    color: #111827;
+    margin-bottom: 1.25rem;
+}
+
+.detailRatingsGrid {
+    display: flex;
+    justify-content: space-between;
+    max-width: 500px;
+    margin: 0 auto 1.5rem auto;
+}
+
+.detailItem {
+    flex: 1;
+}
+
+.detailLabelText {
+    display: block;
+    font-size: 0.9rem;
+    color: #A4A7AE;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.starWithNumber {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.35rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #000000;
+    gap: 0.35rem;
+}
+
+.starIcon {
+    color: #FBB129;
+    font-size: 1.2rem;
+}
+
+.starNumber {
+    color: #000000;
+}
+
+.statsList {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #717680;
+    line-height: 1.6;
+}
+
+.statsList p {
+    margin: 0.4rem 0;
+}
+
+.infoGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.infoCard {
+    border-radius: 12px;
+}
+
+.cardTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.25rem;
+}
+
+.checklistGrid {
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.gridItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.checkLabel {
+    font-size: 0.8rem;
+    color: #A4A7AE;
+    font-weight: 400;
+}
+
+.checkValue {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1C1917;
+}
+
+.checkIcon {
+    color: #10b981;
+}
+
+.authorityRow {
+    grid-column: 1 / -1;
+    display: grid;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.checkLabelFull {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.authorityTags {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.tag {
+    font-weight: 400;
+    padding: 0.4rem 1rem;
+    background: #F5F5F5;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #4b5563;
+}
+
+.tagActive {
+    background: #EBFFEE;
+    color: #34C759;
+    font-weight: 400;
+    font-size: 14px;
+    border-radius: 8px;
+    padding: 0.4rem 1rem;
+}
+
+.cargoList {
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.cargoItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.routeList {
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.notFound {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    text-align: center;
+}
+
+.notFound h2 {
+    font-size: 4rem;
+    margin: 0 0 20px 0;
+    color: #000000;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.notFound button {
+    padding: 12px 24px;
+    background-color: #FF4E00;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease;
+}
+
+.notFound button:hover {
+    background-color: #a73505;
+}
+
+.routeItem {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+
+.reviewsSection {
+    margin: 3rem 0 2rem;
+    padding: 2rem 0;
+    border-top: 1px solid #e5e7eb;
+}
+
+.sectionTitle {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #1f2937;
+    text-align: center;
+}
+
+.noReviews {
+    text-align: center;
+    font-size: 1.125rem;
+    color: #6b7280;
+    font-style: italic;
+    padding: 3rem 1rem;
+    background: #f9fafb;
+    border-radius: 12px;
+}
+
+.reviewCard {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f1f5f9;
+    transition: all 0.2s ease;
+}
+
+.reviewCard:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.reviewerInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.reviewerAvatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f19e63, #f37126);
+    color: white;
+    font-weight: bold;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.reviewerName {
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.reviewDate {
+    font-size: 0.875rem;
+    color: #6b7280;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.reviewRating {
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: #f59e0b;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.reviewText,
+.reviewComment {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #374151;
+    margin: 1rem 0;
+}
+
+.reviewMeta,
+.reviewFlags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+}
+
+.reviewMeta span,
+.reviewFlags span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.reviewMeta span svg,
+.reviewFlags span svg {
+    font-size: 1.1rem;
+}
+
+.reviewMeta span:has(> span:first-child:where(:contains("✓"))) {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.reviewMeta span:has(> span:first-child:where(:contains("✗"))) {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+@media (max-width: 768px) {
+    .reviewHeader {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .reviewRating {
+        align-self: flex-start;
+    }
+
+    .reviewMeta,
+    .reviewFlags {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .infoGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ratingCard {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .infoGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .ratingCard {
+        grid-template-columns: 1fr;
+        padding: 1.2rem;
+    }
+
+    .backButton {
+        font-size: 0.85rem;
+        padding: 0.4rem 1rem;
+    }
+
+    .overallNumber {
+        font-size: 3.5rem;
+    }
+
+    .pageTitle {
+        font-size: 1.5rem;
+    }
+
+    .cardTitle {
+        font-size: 1.15rem;
+    }
+
+    .checklistGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .cargoList {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .main {
+        padding: 1rem 0.75rem;
+    }
+
+    .container {
+        padding: 0 0.5rem;
+    }
+
+    .detailRatingsGrid {
+        flex-direction: column;
+        max-width: 100%;
+    }
+
+    .statsList {
+        font-size: 0.85rem;
+    }
+}

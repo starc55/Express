@@ -1,0 +1,183 @@
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.25s ease;
+    z-index: 10;
+    position: relative;
+}
+
+
+
+.header {
+    padding: 1rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+
+
+
+.reviewerImage {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.companyInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.companyDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.companyName {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: #1C1917;
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.location {
+    font-size: 13px;
+    font-weight: 400;
+    color: #A4A7AE;
+}
+
+.separator {
+    color: #d1d5db;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #4b5563;
+    font-weight: 500;
+}
+
+.star {
+    color: #f59e0b;
+    fill: #f59e0b;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.btn {
+    width: 100%;
+    padding: 0.6rem 1.35rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btnView {
+    background-color: #ff6b00;
+    color: white;
+}
+
+.btnView:hover {
+    background-color: #e55f00;
+}
+
+.btnEdit {
+    background-color: #F5F5F5;
+    color: #374151;
+}
+
+.btnEdit:hover {
+    background-color: #e0e0e0;
+}
+
+.body {
+    position: relative;
+    top: -1rem;
+    padding: 1rem;
+    width: 80%;
+}
+
+.reviewer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.reviewerAvatar {
+    width: 38px;
+    height: 38px;
+    background-color: #e5e7eb;
+    color: #4b5563;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+
+.reviewText {
+    margin: 0;
+    color: #535862;
+    line-height: 1.6;
+    font-size: 15px;
+    font-weight: 300;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.25rem;
+    }
+
+    .actions {
+        width: 100%;
+    }
+
+    .btn {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        margin-bottom: 1.25rem;
+    }
+
+    .header {
+        padding: 1rem 1.25rem;
+    }
+
+    .body {
+        padding: 1.25rem;
+    }
+}
