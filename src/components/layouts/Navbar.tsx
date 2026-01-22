@@ -94,7 +94,7 @@ const Navbar = () => {
                 whileHover="hover"
                 whileTap="tap"
               >
-                {isAdmin ? "Admin" : "User"}{" "}
+                {isAdmin ? "Admin" : "User"}
                 <MdOutlineArrowDropDown size={20} />
               </motion.button>
 
