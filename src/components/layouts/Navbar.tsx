@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/layouts/navbar.css";
-import logo from "@/assets/images/logo.png";
+import logo from "@/assets/images/logo.svg";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { MdOutlineArrowDropDown } from "react-icons/md";
@@ -80,7 +80,7 @@ const Navbar = () => {
           <img src={logo} alt="Xpress logo" />
         </motion.div>
 
-        <motion.span variants={childVariants}>Navigo</motion.span>
+        {/* <motion.span variants={childVariants}>Navigo</motion.span>/ */}
 
         <div className="navbar-right">
           {isAuthenticated ? (
