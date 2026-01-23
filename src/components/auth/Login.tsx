@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/auth/login.css";
 import { GoHome, GoEye, GoEyeClosed } from "react-icons/go";
-import logoUrl from "@/assets/images/logo.png";
+import logoUrl from "@/assets/images/logo.svg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";

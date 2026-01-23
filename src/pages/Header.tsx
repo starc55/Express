@@ -95,7 +95,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
         <motion.div
           className={styles.searchContainer}
           variants={containerVariants}
-          initial="hidden"
+          initial="hidden" 
           animate="visible"
         >
           <form onSubmit={handleSubmit} className={styles.searchBar}>
