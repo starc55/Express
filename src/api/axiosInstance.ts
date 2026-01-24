@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "http://52.91.170.2";
+const API_BASE = "https://backendcarrier.xpresstransportation.org/";
 
 const axiosInstance = axios.create({
   baseURL: API_BASE,

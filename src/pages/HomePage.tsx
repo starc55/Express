@@ -112,6 +112,7 @@ export default function Home() {
       if (enhancedCompanies.length === 0) {
         setError("No companies found");
       }
+      console.log("Fetched companies:", enhancedCompanies);
     } catch (err: any) {
       console.error("Error fetching data:", err);
       setError("Failed to load companies. Please try again.");
