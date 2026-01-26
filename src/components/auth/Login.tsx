@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/auth/login.css";
 import { GoHome, GoEye, GoEyeClosed } from "react-icons/go";
@@ -7,20 +7,40 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 import toast from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
+
+interface DecodedToken {
+  user_id?: string | number;
+  sub?: string | number;
+  exp?: number;
+  iat?: number;
+  jti?: string;
+  token_type?: string;
+  [key: string]: any;
+}
 
 const Login = () => {
-  const [selectedType, setSelectedType] = useState<"User" | "Admin">("User");
+  const [accountType, setAccountType] = useState<"User" | "Admin">("User");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("remember_email");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const response = await axios.post(
@@ -33,50 +53,65 @@ const Login = () => {
         }
       );
 
-      const { access, refresh } = response.data;
+      const { access, refresh, role } = response.data;
 
-      localStorage.setItem("access_token", access || "");
+      if (!access) {
+        throw new Error("Access token not received");
+      }
+
+      const decoded = jwtDecode<DecodedToken>(access);
+
+      const userRole = (role || "user").toLowerCase();
+
+      if (accountType === "Admin" && userRole !== "admin") {
+        throw new Error(
+          "You do not have permission to log in as Admin. Please use the correct account."
+        );
+      }
+
+      localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh || "");
 
+      if (rememberMe) {
+        localStorage.setItem("remember_email", email.trim().toLowerCase());
+      } else {
+        localStorage.removeItem("remember_email");
+      }
+
       const userData = {
-        id: "temp-" + Date.now(),
-        name: selectedType === "Admin" ? "Admin" : "User",
-        email,
-        role: selectedType.toLowerCase() as "user" | "admin",
+        id: decoded.user_id || decoded.sub || `temp-${Date.now()}`,
+        name: userRole === "admin" ? "Admin" : "User",
+        email: email.trim().toLowerCase(),
+        role: userRole as "user" | "admin",
       };
 
       login(userData);
 
       toast.success("Login successful!");
-
-      if (selectedType === "Admin") {
-        navigate("/");
-      } else {
-        navigate("/dashboard");
-      }
+      navigate("/");
     } catch (err: any) {
-      let errMsg = "Incorrect email or password. Please try again.";
+      let errorMessage = "Invalid email or password. Please try again.";
 
-      if (err.response?.status === 401) {
+      if (err.message?.includes("do not have permission to log in as Admin")) {
+        errorMessage = err.message;
+      } else if (err.response?.status === 401) {
         const detail = err.response.data?.detail || "";
-        if (detail.includes("No active account") || detail.includes("active")) {
-          errMsg =
-            "Account is not active. Please set is_active to True in the backend!";
-        } else if (detail) {
-          errMsg = detail;
-        } else {
-          errMsg = "401 Unauthorized – invalid credentials";
-        }
+        errorMessage = detail.includes("active")
+          ? "Account is not active. Please contact support."
+          : detail || "Unauthorized – invalid credentials";
       } else if (
         err.message?.includes("Network") ||
         err.message?.includes("CORS")
       ) {
-        errMsg = "Could not connect to the server (CORS or server issue)";
+        errorMessage =
+          "Unable to connect to the server. Check your internet connection.";
+      } else if (err.message) {
+        errorMessage = err.message;
       }
 
-      toast.error(errMsg);
+      toast.error(errorMessage);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -87,14 +122,14 @@ const Login = () => {
       </div>
 
       <div className="login-container">
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleSubmit}>
           <motion.div
             initial={{ opacity: 0, y: -15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="logo"
           >
-            <img src={logoUrl} alt="Xpress logo" className="logo-image" />
+            <img src={logoUrl} alt="Logo" className="logo-image" />
           </motion.div>
 
           <motion.h2
@@ -103,7 +138,7 @@ const Login = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            Select account type to sign in
+            Select account type
           </motion.h2>
 
           <div className="login-options">
@@ -111,18 +146,18 @@ const Login = () => {
               <button
                 type="button"
                 className={`login-button ${
-                  selectedType === "User" ? "active" : ""
+                  accountType === "User" ? "active" : ""
                 }`}
-                onClick={() => setSelectedType("User")}
+                onClick={() => setAccountType("User")}
               >
                 User
               </button>
               <button
                 type="button"
                 className={`login-button ${
-                  selectedType === "Admin" ? "active" : ""
+                  accountType === "Admin" ? "active" : ""
                 }`}
-                onClick={() => setSelectedType("Admin")}
+                onClick={() => setAccountType("Admin")}
               >
                 Admin
               </button>
@@ -131,14 +166,14 @@ const Login = () => {
                 className="slider"
                 layout
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                animate={{ x: selectedType === "User" ? 0 : "100%" }}
+                animate={{ x: accountType === "User" ? 0 : "100%" }}
               />
             </div>
           </div>
 
           <AnimatePresence mode="wait">
             <motion.div
-              key={selectedType}
+              key={accountType}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
@@ -146,7 +181,7 @@ const Login = () => {
               className="input-fields"
             >
               <div className="input-group">
-                <label htmlFor="email">Email*</label>
+                <label htmlFor="email">Email *</label>
                 <input
                   id="email"
                   type="email"
@@ -158,7 +193,7 @@ const Login = () => {
               </div>
 
               <div className="input-group">
-                <label htmlFor="password">Password*</label>
+                <label htmlFor="password">Password *</label>
                 <div style={{ position: "relative" }}>
                   <input
                     id="password"
@@ -174,13 +209,13 @@ const Login = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     style={{
                       position: "absolute",
-                      right: "1.5rem",
+                      right: "12px",
                       top: "50%",
                       transform: "translateY(-50%)",
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      fontSize: "1.2rem",
+                      fontSize: "1.3rem",
                       color: "#6B7280",
                     }}
                   >
@@ -191,12 +226,14 @@ const Login = () => {
 
               <div className="login-footer">
                 <div className="remember-me">
-                  <input type="checkbox" id="remember" />
+                  <input
+                    type="checkbox"
+                    id="remember"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
                   <label htmlFor="remember">Remember me</label>
                 </div>
-                <a href="#" className="forgot-password">
-                  Forgot password?
-                </a>
               </div>
             </motion.div>
           </AnimatePresence>
@@ -204,11 +241,11 @@ const Login = () => {
           <motion.button
             type="submit"
             className="submit-button"
-            disabled={loading}
-            whileHover={{ scale: loading ? 1 : 1.03 }}
-            whileTap={{ scale: loading ? 1 : 0.97 }}
+            disabled={isLoading}
+            whileHover={{ scale: isLoading ? 1 : 1.03 }}
+            whileTap={{ scale: isLoading ? 1 : 0.97 }}
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {isLoading ? "Signing in..." : "Sign In"}
           </motion.button>
         </form>
       </div>

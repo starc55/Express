@@ -14,13 +14,13 @@ const footerVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: "easeOut", staggerChildren: 0.12 },
+    transition: { duration: 0.2, ease: "easeOut", staggerChildren: 0.12 },
   },
 } as const;
 
 const itemVariants = {
   hidden: { opacity: 0, y: 15 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
 };
 
 const Footer: React.FC = () => {

@@ -18,14 +18,14 @@ const containerVariants = {
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 60, scale: 0.92 },
+  hidden: { opacity: 0, y: 60, scale: 0.2 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.7, ease: "easeOut" as const },
+    transition: { duration: 0.1, ease: "easeOut" as const },
   },
-  hover: { scale: 1.04, y: -8, transition: { duration: 0.35 } },
+  hover: { scale: 1.01, y: -3, transition: { duration: 0.1 } },
 };
 
 export default function Home() {
@@ -115,7 +115,7 @@ export default function Home() {
       console.log("Fetched companies:", enhancedCompanies);
     } catch (err: any) {
       console.error("Error fetching data:", err);
-      setError("Failed to load companies. Please try again.");
+      setError("Please login to view companies.");
     } finally {
       setLoading(false);
     }
@@ -223,7 +223,6 @@ export default function Home() {
                       isAdmin={isAdmin}
                       onViewDetails={() => navigate(`/company/${company.id}`)}
                       onEdit={() => handleEditClick(company)}
-                      onDelete={() => handleDeleteCompany(company.id)}
                     />
                   </motion.div>
                 ))}

@@ -17,7 +17,6 @@ interface CompanyCardProps {
   isAdmin?: boolean;
   onViewDetails: (id: string | number) => void;
   onEdit?: (id: string | number) => void;
-  onDelete?: (id: string | number) => void;
 }
 
 const cardVariants = {
@@ -59,7 +58,6 @@ const CompanyCard: React.FC<CompanyCardProps> = ({
   isAdmin = false,
   onViewDetails,
   onEdit,
-  onDelete,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -107,43 +105,44 @@ const CompanyCard: React.FC<CompanyCardProps> = ({
           </div>
         </div>
 
-        <div className={styles.actions}>
-          <motion.button
-            type="button"
-            className={`${styles.btn} ${styles.btnView}`}
-            onClick={() => onViewDetails(id)}
-            variants={buttonVariants}
-            whileHover="hover"
-            whileTap="tap"
-          >
-            View Details
-          </motion.button>
+        {isAdmin && (
+          <div className={styles.actions}>
+            <motion.button
+              type="button"
+              className={`${styles.btn} ${styles.btnView}`}
+              onClick={() => onViewDetails(id)}
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+            >
+              View Details
+            </motion.button>
 
-          {isAdmin && (
-            <>
+            {onEdit && (
               <motion.button
                 type="button"
                 className={`${styles.btn} ${styles.btnEdit}`}
-                onClick={() => onEdit?.(id)}
+                onClick={() => onEdit(id)}
                 variants={buttonVariants}
                 whileHover="hover"
                 whileTap="tap"
               >
                 Edit
               </motion.button>
-              <motion.button
-                type="button"
-                className={`${styles.btn} ${styles.btnEdit}`}
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="tap"
-                onClick={() => setIsModalOpen(true)}
-              >
-                Add Review
-              </motion.button>
-            </>
-          )}
-        </div>
+            )}
+
+            <motion.button
+              type="button"
+              className={`${styles.btn} ${styles.btnEdit}`}
+              onClick={() => setIsModalOpen(true)}
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+            >
+              Add Review
+            </motion.button>
+          </div>
+        )}
       </div>
 
       <div className={styles.body}>
@@ -157,12 +156,14 @@ const CompanyCard: React.FC<CompanyCardProps> = ({
         </motion.p>
       </div>
 
-      <ReviewModal
-        companyName={name}
-        companyId={Number(id)}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      {isAdmin && (
+        <ReviewModal
+          companyName={name}
+          companyId={Number(id)}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </motion.div>
   );
 };
