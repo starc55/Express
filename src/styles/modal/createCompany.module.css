@@ -512,3 +512,16 @@
         align-self: flex-end;
     }
 }
+
+.sectionHeader {
+    margin: 24px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.sectionHeader h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+}

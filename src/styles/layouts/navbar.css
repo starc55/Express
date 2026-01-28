@@ -19,6 +19,17 @@
     z-index: 1000;
 }
 
+.navigo {
+    font-weight: 600;
+    font-size: 20px;
+    background: linear-gradient(to right, #ff4e00, #244567);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    text-decoration: none;
+}
+
 .navbar-logo {
     background-color: white;
     border-radius: 12px;
@@ -146,6 +157,9 @@
         padding: 0.9rem 1.2rem;
         font-size: 0.95rem;
     }
+    .navigo{
+        font-size: 18px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -191,6 +205,9 @@
         padding: 0.85rem 1rem;
         font-size: 0.92rem;
         gap: 0.7rem;
+    }
+    .navigo{
+        font-size: 16px;
     }
 }
 

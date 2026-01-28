@@ -459,19 +459,19 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
       opacity: 1,
       scale: 1,
       y: 0,
-      transition: { duration: 0.4, ease: "easeOut", staggerChildren: 0.08 },
+      transition: { duration: 0.1, ease: "easeOut", staggerChildren: 0.08 },
     },
-    exit: { opacity: 0, scale: 0.85, y: 80, transition: { duration: 0.3 } },
+    exit: { opacity: 0, scale: 0.85, y: 80, transition: { duration: 0.1 } },
   } as const;
 
   const childVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.1 } },
   };
 
   const buttonVariants = {
     rest: { scale: 1 },
-    hover: { scale: 1.04, transition: { duration: 0.2 } },
+    hover: { scale: 1.04, transition: { duration: 0.1 } },
     tap: { scale: 0.97 },
   };
 
@@ -505,6 +505,9 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
             )}
 
             <motion.form onSubmit={handleSubmit} variants={childVariants}>
+              <div className={styles.sectionHeader}>
+                <h3>Company Information</h3>
+              </div>
               <motion.div className={styles.formGroup} variants={childVariants}>
                 <label className={styles.formLabel}>Name*</label>
                 <input
@@ -572,6 +575,9 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
                 />
               </motion.div>
 
+              <div className={styles.sectionHeader}>
+                <h3>Contact information</h3>
+              </div>
               <motion.div className={styles.formGroup} variants={childVariants}>
                 <label className={styles.formLabel}>Contacts</label>
 
@@ -629,6 +635,9 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
                 </button>
               </motion.div>
 
+              <div className={styles.sectionHeader}>
+                <h3>Driver Information</h3>
+              </div>
               <motion.div className={styles.formGroup} variants={childVariants}>
                 <label className={styles.formLabel}>Driver Information</label>
 
@@ -712,6 +721,10 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
                   <FaPlus /> Add Driver
                 </button>
               </motion.div>
+
+              <div className={styles.sectionHeader}>
+                <h3>Insurance Information</h3>
+              </div>
 
               <motion.div className={styles.formGroup} variants={childVariants}>
                 <label className={styles.formLabel}>Insurance Company*</label>
@@ -805,6 +818,10 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
                   )}
                 </div>
               </motion.div>
+
+              <div className={styles.sectionHeader}>
+                <h3>Equipment and Route</h3>
+              </div>
 
               <motion.div className={styles.formGroup} variants={childVariants}>
                 <label className={styles.formLabel}>

@@ -82,23 +82,23 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({
       scale: 1,
       y: 0,
       transition: {
-        duration: 0.4,
+        duration: 0.1,
         ease: "easeOut" as const,
         when: "beforeChildren",
         staggerChildren: 0.08,
       },
     },
-    exit: { opacity: 0, scale: 0.85, y: 80, transition: { duration: 0.3 } },
+    exit: { opacity: 0, scale: 0.85, y: 80, transition: { duration: 0.1 } },
   };
 
   const childVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.1 } },
   };
 
   const buttonVariants = {
     rest: { scale: 1 },
-    hover: { scale: 1.04, transition: { duration: 0.2 } },
+    hover: { scale: 1.04, transition: { duration: 0.1 } },
     tap: { scale: 0.97 },
   };
 

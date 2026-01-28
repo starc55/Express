@@ -81,7 +81,7 @@ const Navbar = () => {
           <img src={logo} alt="Xpress logo" />
         </motion.div>
 
-        <p>Navigo</p>
+        <p className="navigo">Navigo</p>
 
         <div className="navbar-right">
           {isAuthenticated ? (
