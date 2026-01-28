@@ -75,15 +75,6 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({
     }
   };
 
-  const handleReset = () => {
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setPhone("");
-    setPassword("");
-    setError(null);
-  };
-
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.85, y: 80 },
     visible: {
@@ -210,17 +201,6 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({
                 className={styles.modalActions}
                 variants={childVariants}
               >
-                <motion.button
-                  type="button"
-                  className={styles.resetBtn}
-                  onClick={handleReset}
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                >
-                  Reset
-                </motion.button>
-
                 <motion.button
                   type="submit"
                   className={styles.applyBtn}

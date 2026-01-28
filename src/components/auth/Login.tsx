@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import "@/styles/auth/login.css";
 import { GoHome, GoEye, GoEyeClosed } from "react-icons/go";
 import logoUrl from "@/assets/images/logo.svg";
@@ -126,7 +126,7 @@ const Login = () => {
           <motion.div
             initial={{ opacity: 0, y: -15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.2 }}
             className="logo"
           >
             <img src={logoUrl} alt="Logo" className="logo-image" />
@@ -136,7 +136,7 @@ const Login = () => {
             className="subtitle"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
+            transition={{ delay: 0.1, duration: 0.2 }}
           >
             Select account type
           </motion.h2>
@@ -171,72 +171,63 @@ const Login = () => {
             </div>
           </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={accountType}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="input-fields"
-            >
-              <div className="input-group">
-                <label htmlFor="email">Email *</label>
+          <div className="input-fields">
+            <div className="input-group">
+              <label htmlFor="email">Email *</label>
+              <input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value.trim())}
+                required
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="password">Password *</label>
+              <div style={{ position: "relative" }}>
                 <input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value.trim())}
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
+                  style={{ paddingRight: "40px" }}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "20px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "1.3rem",
+                    color: "#6B7280",
+                  }}
+                >
+                  {showPassword ? <GoEyeClosed /> : <GoEye />}
+                </button>
               </div>
+            </div>
 
-              <div className="input-group">
-                <label htmlFor="password">Password *</label>
-                <div style={{ position: "relative" }}>
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    style={{ paddingRight: "40px" }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: "absolute",
-                      right: "12px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      fontSize: "1.3rem",
-                      color: "#6B7280",
-                    }}
-                  >
-                    {showPassword ? <GoEyeClosed /> : <GoEye />}
-                  </button>
-                </div>
+            <div className="login-footer">
+              <div className="remember-me">
+                <input
+                  type="checkbox"
+                  id="remember"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                <label htmlFor="remember">Remember me</label>
               </div>
-
-              <div className="login-footer">
-                <div className="remember-me">
-                  <input
-                    type="checkbox"
-                    id="remember"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                  />
-                  <label htmlFor="remember">Remember me</label>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+            </div>
+          </div>
 
           <motion.button
             type="submit"

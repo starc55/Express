@@ -15,3 +15,8 @@ export interface ApiErrorDetail {
   password?: string[];
   [key: string]: any;
 }
+
+interface CompanyFormData {
+  status: "open" | "closed" | "";
+  enclosed: string[];
+}

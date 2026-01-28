@@ -60,6 +60,7 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    margin-bottom: 0.7rem;
 }
 
 .formLabel {
@@ -185,4 +186,329 @@
 
 .modalContent::-webkit-scrollbar {
     display: none;
+}
+
+.routeRow {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.contactRow {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.contactRow input {
+    flex: 1;
+    min-width: 120px;
+}
+
+.contactremoveBtn {
+    background: #ff4d4f;
+    color: white;
+    height: 32px;
+    align-items: center;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 5px;
+    cursor: pointer;
+}
+
+.addBtn {
+    align-items: center;
+    background: #c2410c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.addBtn:hover {
+    background: #9a3412;
+}
+
+.driverSection {
+    margin: 24px 0;
+    padding: 20px;
+    background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.driverSection .formLabel {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 16px;
+    display: block;
+}
+
+.driverRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    flex-wrap: wrap;
+}
+
+.driverRow:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.driverRow input {
+    flex: 1;
+    min-width: 180px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.driverRow input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.fileUploadSection {
+    flex: 1 1 300px;
+    min-width: 250px;
+    max-height: 150px;
+    overflow: auto;
+}
+
+.fileLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 14px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 2px dashed #7dd3fc;
+    transition: all 0.25s ease;
+    font-weight: 500;
+}
+
+.fileLabel:hover {
+    background: #bae6fd;
+    border-color: #60a5fa;
+    transform: translateY(-1px);
+}
+
+.fileList {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fileItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #334155;
+    border: 1px solid #e5e7eb;
+}
+
+.fileItem span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fileRemoveBtn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fileRemoveBtn:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+.driverRow .removeBtn {
+    background: #f87171;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+}
+
+.driverRow .removeBtn:hover {
+    background: #ef4444;
+    transform: scale(1.08);
+}
+
+
+
+@media (max-width: 768px) {
+    .driverRow {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .driverRow input,
+    .fileUploadSection {
+        width: 100%;
+    }
+
+    .driverRow .removeBtn {
+        width: 100%;
+        height: 48px;
+    }
+
+    .addBtn {
+        width: 100%;
+        padding: 14px;
+    }
+}
+
+.fileUploadSection {
+    background-color: #f9fafb;
+    border: 2px dashed #d1d5db;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.fileUploadSection:hover {
+    border-color: #3b82f6;
+    background-color: #f0f7ff;
+}
+
+.fileLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    color: #374151;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.fileLabel:hover {
+    background-color: #eff6ff;
+    border-color: #60a5fa;
+    color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.fileLabel svg {
+    color: #6b7280;
+}
+
+.fileLabel:hover svg {
+    color: #2563eb;
+}
+
+.fileList {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.fileItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: #1f2937;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.fileItem:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fileItem span {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 1rem;
+}
+
+.fileRemoveBtn {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    padding: 0.375rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.fileRemoveBtn:hover {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+@media (max-width: 640px) {
+    .fileItem {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .fileItem span {
+        padding-right: 0;
+    }
+
+    .fileRemoveBtn {
+        align-self: flex-end;
+    }
 }

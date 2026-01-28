@@ -69,38 +69,6 @@ const Footer: React.FC = () => {
               </address>
             </div>
           </motion.div>
-
-          <motion.div className={styles.social} variants={itemVariants}>
-            <a
-              href="https://www.instagram.com/xpressautotransportation/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-              className={styles.socialLink}
-            >
-              <FaInstagram className={styles.socialIcon} />
-            </a>
-
-            <a
-              href="https://www.facebook.com/xpressautotransportation/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Facebook"
-              className={styles.socialLink}
-            >
-              <FaFacebookF className={styles.socialIcon} />
-            </a>
-
-            <a
-              href="https://www.youtube.com/@XpressAutoTransportationInc/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="YouTube"
-              className={styles.socialLink}
-            >
-              <FaYoutube className={styles.socialIcon} />
-            </a>
-          </motion.div>
         </div>
 
         <motion.div className={styles.bottom} variants={itemVariants}>

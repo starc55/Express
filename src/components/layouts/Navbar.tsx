@@ -46,6 +46,7 @@ const Navbar = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isCreateCompanyModalOpen, setIsCreateCompanyModalOpen] =
     useState(false);
+
   const navigate = useNavigate();
   const { isAuthenticated, isAdmin, logout } = useAuth();
 
@@ -80,72 +81,83 @@ const Navbar = () => {
           <img src={logo} alt="Xpress logo" />
         </motion.div>
 
-        {/* <motion.span variants={childVariants}>Navigo</motion.span>/ */}
+        <p>Navigo</p>
 
         <div className="navbar-right">
           {isAuthenticated ? (
-            <div className="user-dropdown">
+            isAdmin ? (
+              <div className="user-dropdown">
+                <motion.button
+                  type="button"
+                  className="navbar-button user-button"
+                  onClick={toggleDropdown}
+                  variants={buttonVariants}
+                  initial="rest"
+                  whileHover="hover"
+                  whileTap="tap"
+                >
+                  Admin
+                  <MdOutlineArrowDropDown size={20} />
+                </motion.button>
+
+                <AnimatePresence>
+                  {dropdownOpen && (
+                    <motion.div
+                      className="dropdown-menu"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <button
+                        type="button"
+                        className="dropdown-item"
+                        onClick={() => {
+                          setIsAddModalOpen(true);
+                          setDropdownOpen(false);
+                        }}
+                      >
+                        <HiOutlineUserPlus size={20} />
+                        Add Employee
+                      </button>
+                      <button
+                        type="button"
+                        className="dropdown-item"
+                        onClick={() => {
+                          setIsCreateCompanyModalOpen(true);
+                          setDropdownOpen(false);
+                        }}
+                      >
+                        <HiOutlineBuildingOffice size={20} />
+                        Add Company
+                      </button>
+
+                      <button
+                        type="button"
+                        className="dropdown-item logout"
+                        onClick={handleLogout}
+                      >
+                        <RiLogoutCircleLine size={20} />
+                        Log Out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
               <motion.button
                 type="button"
-                className="navbar-button user-button"
-                onClick={toggleDropdown}
+                className="navbar-button logout-button"
+                onClick={handleLogout}
                 variants={buttonVariants}
                 initial="rest"
                 whileHover="hover"
                 whileTap="tap"
               >
-                {isAdmin ? "Admin" : "User"}
-                <MdOutlineArrowDropDown size={20} />
+                <RiLogoutCircleLine size={20} style={{ marginRight: "8px" }} />
+                Log Out
               </motion.button>
-
-              <AnimatePresence>
-                {dropdownOpen && (
-                  <motion.div
-                    className="dropdown-menu"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {isAdmin && (
-                      <>
-                        <button
-                          type="button"
-                          className="dropdown-item"
-                          onClick={() => {
-                            setIsAddModalOpen(true);
-                            setDropdownOpen(false);
-                          }}
-                        >
-                          <HiOutlineUserPlus size={20} />
-                          Add Employee
-                        </button>
-                        <button
-                          type="button"
-                          className="dropdown-item"
-                          onClick={() => {
-                            setIsCreateCompanyModalOpen(true);
-                            setDropdownOpen(false);
-                          }}
-                        >
-                          <HiOutlineBuildingOffice size={20} />
-                          Create Company
-                        </button>
-                      </>
-                    )}
-
-                    <button
-                      type="button"
-                      className="dropdown-item logout"
-                      onClick={handleLogout}
-                    >
-                      <RiLogoutCircleLine size={20} />
-                      Log Out
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            )
           ) : (
             <motion.button
               type="button"

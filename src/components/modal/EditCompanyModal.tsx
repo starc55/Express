@@ -24,6 +24,11 @@ interface CompanyFormData {
   number_of_trucks: string | number;
   equipment_description: string;
   route_description: string;
+  status: "open" | "closed" | "";
+  enclosed: string[];
+  routeId?: number;
+  from_location?: string;
+  to_location?: string;
 }
 
 interface EditCompanyModalProps {
@@ -62,6 +67,10 @@ export default function EditCompanyModal({
     number_of_trucks: "",
     equipment_description: "",
     route_description: "",
+    status: "open",
+    enclosed: [],
+    from_location: "",
+    to_location: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -74,6 +83,11 @@ export default function EditCompanyModal({
         number_of_trucks: company.number_of_trucks?.toString() || "",
         physical_damage_limit: company.physical_damage_limit?.toString() || "",
         insurance_deductible: company.insurance_deductible?.toString() || "",
+        status: company.status || "open",
+        enclosed: Array.isArray(company.enclosed) ? company.enclosed : [],
+        from_location: company.from_location || "",
+        to_location: company.to_location || "",
+        routeId: company.routeId,
       });
     }
   }, [company]);
@@ -86,11 +100,21 @@ export default function EditCompanyModal({
     >
   ) => {
     const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
-    }));
+
+    if (type === "checkbox") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: (e.target as HTMLInputElement).checked,
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleMultiSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const options = [...e.target.selectedOptions];
+    const values = options.map((opt) => opt.value);
+    setFormData((prev) => ({ ...prev, enclosed: values }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,27 +123,53 @@ export default function EditCompanyModal({
     setLoading(true);
 
     try {
-      const payload = {
-        ...formData,
-        number_of_trucks: formData.number_of_trucks
-          ? Number(formData.number_of_trucks)
-          : 0,
+      const companyPayload = {
+        name: formData.name.trim() || null,
+        photo: null,
+        usdot: formData.usdot.trim() || null,
+        mc_number: formData.mc_number.trim() || null,
+        status: formData.status || "open",
+        enclosed: formData.enclosed.length > 0 ? formData.enclosed : [],
+        business_address: formData.business_address.trim() || null,
+        insurance_company: formData.insurance_company.trim() || null,
         physical_damage_limit: formData.physical_damage_limit
           ? Number(formData.physical_damage_limit)
           : null,
+        insurance_agent: formData.insurance_agent.trim() || null,
         insurance_deductible: formData.insurance_deductible
           ? Number(formData.insurance_deductible)
           : null,
-        out_of_service_date: formData.out_of_service_date || null,
+        insurance_phone: formData.insurance_phone.trim() || null,
+        number_of_trucks: formData.number_of_trucks
+          ? Number(formData.number_of_trucks)
+          : 0,
+        equipment_description: formData.equipment_description.trim() || null,
+        route_description: formData.route_description.trim() || null,
       };
 
-      await axiosInstance.put(`/api/v1/company/update/${company.id}/`, payload);
+      await axiosInstance.put(
+        `/api/v1/company/update/${company.id}/`,
+        companyPayload
+      );
+
+      if (formData.routeId) {
+        const routePayload = {
+          company: Number(company.id),
+          from_location: formData.from_location?.trim() || null,
+          to_location: formData.to_location?.trim() || null,
+        };
+
+        await axiosInstance.put(
+          `/api/v1/company-route/update/${formData.routeId}/`,
+          routePayload
+        );
+      }
 
       onSave(formData);
       onClose();
     } catch (err: any) {
-      console.error("Update company error:", err);
-      let errMsg = "An error occurred while updating company information.";
+      console.error("Update error:", err);
+      let errMsg = "Failed to update company information.";
 
       if (err.response?.status === 400) {
         const data = err.response.data;
@@ -129,11 +179,13 @@ export default function EditCompanyModal({
           const errors = Object.entries(data)
             .map(
               ([key, val]) =>
-                `${key}: ${Array.isArray(val) ? val.join(", ") : val}`
+                `${key}: ${Array.isArray(val) ? val.join(", ") : String(val)}`
             )
             .join("\n");
-          errMsg = errors || "Incorrect information entered.";
+          errMsg = errors || "Invalid data provided.";
         }
+      } else if (err.response?.status === 404) {
+        errMsg = "Company or route not found.";
       }
 
       setError(errMsg);
@@ -229,21 +281,6 @@ export default function EditCompanyModal({
                   <div className={styles.grid}>
                     <div>
                       <label className={`${styles.label} ${styles.required}`}>
-                        Business Type
-                      </label>
-                      <input
-                        type="text"
-                        name="business_type"
-                        value={formData.business_type}
-                        onChange={handleChange}
-                        placeholder="Business type"
-                        required
-                        className={styles.input}
-                      />
-                    </div>
-
-                    <div>
-                      <label className={`${styles.label} ${styles.required}`}>
                         Business Address
                       </label>
                       <input
@@ -253,166 +290,6 @@ export default function EditCompanyModal({
                         onChange={handleChange}
                         placeholder="Business address"
                         required
-                        className={styles.input}
-                      />
-                    </div>
-                  </div>
-                </section>
-
-                <section className={styles.section}>
-                  <h3 className={styles.sectionTitle}>FMCSA Verification</h3>
-                  <div className={styles.grid}>
-                    <div>
-                      <label className={styles.label}>Allowed to operate</label>
-                      <select
-                        title="Operate"
-                        name="allowed_to_operate"
-                        value={formData.allowed_to_operate ? "Yes" : "No"}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            allowed_to_operate: e.target.value === "Yes",
-                          }))
-                        }
-                        className={styles.select}
-                      >
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className={styles.label}>MCS 150 Outdated</label>
-                      <select
-                        title="Outdated"
-                        name="mcs_150_outdated"
-                        value={formData.mcs_150_outdated ? "Yes" : "No"}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            mcs_150_outdated: e.target.value === "Yes",
-                          }))
-                        }
-                        className={styles.select}
-                      >
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className={styles.label}>Carrier Operation</label>
-                      <select
-                        title="Operation"
-                        name="carrier_operation"
-                        value={formData.carrier_operation}
-                        onChange={handleChange}
-                        className={styles.select}
-                      >
-                        <option value="interstate">Interstate</option>
-                        <option value="intrastate">Intrastate</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className={styles.label}>Authority Status</label>
-                      <select
-                        title="Status"
-                        name="authority_status"
-                        value={formData.authority_status}
-                        onChange={handleChange}
-                        className={styles.select}
-                      >
-                        <option value="broker">Broker</option>
-                        <option value="common">Common</option>
-                        <option value="contract">Contract</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className={styles.mt4}>
-                    <label className={styles.label}>Out of Service Date</label>
-                    <input
-                      title="Date"
-                      type="date"
-                      name="out_of_service_date"
-                      value={formData.out_of_service_date}
-                      onChange={handleChange}
-                      className={styles.input}
-                    />
-                  </div>
-                </section>
-
-                <section className={styles.section}>
-                  <h3 className={styles.sectionTitle}>Cargo Insurance</h3>
-                  <div className={styles.grid}>
-                    <div>
-                      <label className={`${styles.label} ${styles.required}`}>
-                        Insurance Company
-                      </label>
-                      <input
-                        type="text"
-                        name="insurance_company"
-                        value={formData.insurance_company}
-                        onChange={handleChange}
-                        placeholder="Insurance company name"
-                        required
-                        className={styles.input}
-                      />
-                    </div>
-
-                    <div>
-                      <label className={styles.label}>Insurance Agent</label>
-                      <input
-                        type="text"
-                        name="insurance_agent"
-                        value={formData.insurance_agent}
-                        onChange={handleChange}
-                        placeholder="Agent name"
-                        className={styles.input}
-                      />
-                    </div>
-
-                    <div>
-                      <label className={styles.label}>Insurance Phone</label>
-                      <input
-                        type="tel"
-                        name="insurance_phone"
-                        value={formData.insurance_phone}
-                        onChange={handleChange}
-                        placeholder="Phone number"
-                        className={styles.input}
-                      />
-                    </div>
-                  </div>
-
-                  <div
-                    className={`${styles.grid} ${styles.grid4} ${styles.mt6}`}
-                  >
-                    <div>
-                      <label className={styles.label}>
-                        Physical Damage Limit
-                      </label>
-                      <input
-                        type="number"
-                        name="physical_damage_limit"
-                        value={formData.physical_damage_limit}
-                        onChange={handleChange}
-                        placeholder="Limit amount"
-                        className={styles.input}
-                      />
-                    </div>
-
-                    <div>
-                      <label className={styles.label}>
-                        Insurance Deductible
-                      </label>
-                      <input
-                        type="number"
-                        name="insurance_deductible"
-                        value={formData.insurance_deductible}
-                        onChange={handleChange}
-                        placeholder="Deductible amount"
                         className={styles.input}
                       />
                     </div>
@@ -469,6 +346,67 @@ export default function EditCompanyModal({
                     />
                   </div>
                 </section>
+
+                <div className={styles.mt4}>
+                  <label className={styles.label}>Status</label>
+                  <select
+                    title="Select Status"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    className={styles.input}
+                  >
+                    <option value="open">Open</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </div>
+
+                <div className={styles.mt4}>
+                  <label className={styles.label}>
+                    Enclosed / Trailer Type
+                  </label>
+                  <select
+                    title="Select Enclosed / Trailer Type"
+                    multiple
+                    value={formData.enclosed}
+                    onChange={handleMultiSelectChange}
+                    className={`${styles.input} ${styles.multiSelect}`}
+                    size={5}
+                  >
+                    <option value="open">Open</option>
+                    <option value="enclosed">Enclosed</option>
+                    <option value="flatbed">Flatbed</option>
+                    <option value="inoperable">Inoperable</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                  <small className={styles.helperText}>
+                    Hold Ctrl (or Cmd) to select multiple options
+                  </small>
+                </div>
+
+                <div className={styles.mt4}>
+                  <label className={styles.label}>From Location</label>
+                  <input
+                    type="text"
+                    name="from_location"
+                    value={formData.from_location || ""}
+                    onChange={handleChange}
+                    placeholder="From location"
+                    className={styles.input}
+                  />
+                </div>
+
+                <div className={styles.mt4}>
+                  <label className={styles.label}>To Location</label>
+                  <input
+                    type="text"
+                    name="to_location"
+                    value={formData.to_location || ""}
+                    onChange={handleChange}
+                    placeholder="To location"
+                    className={styles.input}
+                  />
+                </div>
 
                 <div className={styles.footer}>
                   <button

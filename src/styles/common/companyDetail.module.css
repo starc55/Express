@@ -493,6 +493,91 @@
     color: #991b1b;
 }
 
+.contactList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.contactItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px 20px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.contactItem:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+}
+
+.contactInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.contactName {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.contactDetail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #475569;
+}
+
+.contactDetail svg {
+    color: #64748b;
+    flex-shrink: 0;
+}
+
+.deleteContactBtn {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.deleteContactBtn:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    transform: scale(1.1);
+}
+
+.deleteContactBtn:active {
+    transform: scale(0.95);
+}
+
+.noData {
+    text-align: center;
+    color: #64748b;
+    font-size: 15px;
+    padding: 24px 0;
+    font-style: italic;
+}
+
+.infoCard h3 {
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+}
+
 @media (max-width: 768px) {
     .reviewHeader {
         flex-direction: column;

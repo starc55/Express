@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { CiStar } from "react-icons/ci";
-import { BsCheckCircle } from "react-icons/bs";
+import {
+  BsCheckCircle,
+  BsTrash,
+  BsTelephone,
+  BsEnvelope,
+} from "react-icons/bs";
 import Footer from "@/components/layouts/Footer";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
@@ -83,12 +88,14 @@ export default function CompanyDetail() {
   const navigate = useNavigate();
 
   const [company, setCompany] = useState<any>(null);
+  const [insurance, setInsurance] = useState<any>(null);
+  const [contacts, setContacts] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCompany = async () => {
+    const fetchData = async () => {
       if (!id) return;
 
       const loadingToast = toast.loading("Loading company details...");
@@ -100,7 +107,29 @@ export default function CompanyDetail() {
         const companyRes = await axiosInstance.get(
           `/api/v1/company/detail/${id}/`
         );
-        setCompany(companyRes.data);
+        const companyData = companyRes.data;
+        setCompany(companyData);
+
+        const companyContacts = companyData.contacts || [];
+        setContacts(companyContacts);
+
+        try {
+          const insuranceRes = await axiosInstance.get(
+            `/api/v1/insurance-details/`,
+            {
+              params: { company: id },
+            }
+          );
+          const insuranceData =
+            insuranceRes.data.results || insuranceRes.data || [];
+          setInsurance(insuranceData.length > 0 ? insuranceData[0] : null);
+        } catch (insErr) {
+          console.warn(
+            "Insurance not loaded, using company data fallback",
+            insErr
+          );
+          setInsurance(null);
+        }
 
         const reviewsRes = await axiosInstance.get("/api/v1/reviews/", {
           params: {
@@ -113,7 +142,7 @@ export default function CompanyDetail() {
 
         toast.success("Loaded successfully", { id: loadingToast });
       } catch (err: any) {
-        console.error("Error loading company or reviews:", err);
+        console.error("Error loading data:", err);
         toast.error("Failed to load company details", { id: loadingToast });
         setError("Company details could not be loaded. Please try again.");
       } finally {
@@ -121,8 +150,22 @@ export default function CompanyDetail() {
       }
     };
 
-    fetchCompany();
+    fetchData();
   }, [id]);
+
+  const handleDeleteContact = async (contactId: number) => {
+    if (!window.confirm("Are you sure you want to delete this contact?"))
+      return;
+
+    try {
+      await axiosInstance.delete(`/api/v1/contact/delete/${contactId}/`);
+      setContacts((prev) => prev.filter((c) => c.id !== contactId));
+      toast.success("Contact deleted successfully");
+    } catch (err) {
+      console.error("Delete contact error:", err);
+      toast.error("Failed to delete contact");
+    }
+  };
 
   if (loading) {
     return (
@@ -406,25 +449,49 @@ export default function CompanyDetail() {
             </motion.div>
 
             <motion.div className={styles.infoCard} variants={cardVariants}>
-              <h3 className={styles.cardTitle}>Cargo insurance</h3>
+              <h3 className={styles.cardTitle}>Cargo Insurance</h3>
               <div className={styles.cargoList}>
                 {[
                   {
-                    label: "Insurance company",
-                    value: company.insurance_company || "N/A",
+                    label: "Insurance Company",
+                    value:
+                      insurance?.insurance_company ||
+                      company.insurance_company ||
+                      "N/A",
+                  },
+                  {
+                    label: "Expiration Date",
+                    value: insurance?.expiration_date
+                      ? new Date(insurance.expiration_date).toLocaleDateString()
+                      : "N/A",
+                  },
+                  {
+                    label: "Agent",
+                    value:
+                      insurance?.insurance_agent ||
+                      company.insurance_agent ||
+                      "N/A",
+                  },
+                  {
+                    label: "Insurance Deductible",
+                    value:
+                      insurance?.insurance_deductible ??
+                      company.insurance_deductible ??
+                      "-",
+                  },
+                  {
+                    label: "Phone Number",
+                    value:
+                      insurance?.insurance_phone ||
+                      company.insurance_phone ||
+                      "N/A",
                   },
                   {
                     label: "Physical Damage Limit",
-                    value: company.physical_damage_limit || "-",
-                  },
-                  { label: "Agent", value: company.insurance_agent || "N/A" },
-                  {
-                    label: "Insurance Deductible",
-                    value: company.insurance_deductible || "-",
-                  },
-                  {
-                    label: "Phone number",
-                    value: company.insurance_phone || "N/A",
+                    value:
+                      insurance?.physical_damage_limit ??
+                      company.physical_damage_limit ??
+                      "-",
                   },
                 ].map((item) => (
                   <motion.div
@@ -440,7 +507,7 @@ export default function CompanyDetail() {
             </motion.div>
 
             <motion.div className={styles.infoCard} variants={cardVariants}>
-              <h3 className={styles.cardTitle}>Equipment route</h3>
+              <h3 className={styles.cardTitle}>Equipment & Route</h3>
               <div className={styles.routeList}>
                 {[
                   {
@@ -452,7 +519,7 @@ export default function CompanyDetail() {
                     value: company.equipment_description || "--",
                   },
                   {
-                    label: "Route description",
+                    label: "Route Description",
                     value: company.route_description || "--",
                   },
                 ].map((item) => (
@@ -467,6 +534,44 @@ export default function CompanyDetail() {
                 ))}
               </div>
             </motion.div>
+
+            <motion.div className={styles.infoCard} variants={cardVariants}>
+              <h3 className={styles.cardTitle}>Contacts</h3>
+              {contacts.length === 0 ? (
+                <p className={styles.noData}>No contacts available</p>
+              ) : (
+                <div className={styles.contactList}>
+                  {contacts.map((contact: any) => (
+                    <motion.div
+                      key={contact.id}
+                      className={styles.contactItem}
+                      variants={itemVariants}
+                    >
+                      <div className={styles.contactInfo}>
+                        <div className={styles.contactName}>
+                          <strong>{contact.name || "Unnamed"}</strong>
+                        </div>
+                        <div className={styles.contactDetail}>
+                          <BsEnvelope size={16} /> {contact.email || "N/A"}
+                        </div>
+                        <div className={styles.contactDetail}>
+                          <BsTelephone size={16} /> {contact.phone || "N/A"}
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteContact(contact.id)}
+                        className={styles.deleteContactBtn}
+                        title="Delete contact"
+                      >
+                        <BsTrash size={18} />
+                      </button>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
           </motion.div>
 
           <motion.div
@@ -480,7 +585,7 @@ export default function CompanyDetail() {
             {reviews.length === 0 ? (
               <p className={styles.noReviews}>No reviews yet</p>
             ) : (
-              reviews.map((review) => (
+              reviews.map((review: any) => (
                 <motion.div
                   key={review.id}
                   className={styles.reviewCard}
