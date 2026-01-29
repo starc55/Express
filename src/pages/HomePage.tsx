@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/layouts/Navbar";
 import Header from "./Header";
@@ -33,9 +33,9 @@ export default function Home() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState<any>(null);
 
-  useEffect(() => {
-    fetchData();
-  }, [isAuthenticated, filters]);
+  const fetchedOnceRef = useRef(false);
+
+  const debounceRef = useRef<any>(null);
 
   const fetchData = async () => {
     try {
@@ -47,15 +47,13 @@ export default function Home() {
         if (value !== "") params[key] = value;
       });
 
-      const companiesResponse = await axiosInstance.get("/api/v1/companies/", {
-        params,
-      });
+      const [companiesResponse, reviewsResponse] = await Promise.all([
+        axiosInstance.get("/api/v1/companies/", { params }),
+        axiosInstance.get("/api/v1/reviews/", { params: { page_size: 100 } }),
+      ]);
+
       const companiesData =
         companiesResponse.data.results || companiesResponse.data || [];
-
-      const reviewsResponse = await axiosInstance.get("/api/v1/reviews/", {
-        params: { page_size: 100 },
-      });
       const allReviews = reviewsResponse.data.results || [];
 
       const enhancedCompanies = companiesData.map((company: any) => {
@@ -73,35 +71,47 @@ export default function Home() {
           rating = totalAvg / companyReviews.length;
         }
 
-        const latestReview = companyReviews.sort((a: any, b: any) => {
-          return (
+        const latestReview = companyReviews.sort(
+          (a: any, b: any) =>
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          );
-        })[0];
-
-        const route = company.route || null;
+        )[0];
 
         return {
           ...company,
           rating,
           reviewText: latestReview?.comment || "",
           reviewerName: latestReview?.reviewer_name || "",
-          route,
+          route: company.route || null,
         };
       });
 
       setCompanies(enhancedCompanies);
-
-      if (enhancedCompanies.length === 0) {
-        setError("No companies found");
-      }
-    } catch (err: any) {
-      console.error("Error fetching data:", err);
+      if (enhancedCompanies.length === 0) setError("No companies found");
+    } catch (err) {
+      console.error("Fetch error:", err);
       setError("Please login to view companies.");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    if (!fetchedOnceRef.current) {
+      fetchedOnceRef.current = true;
+      fetchData();
+      return;
+    }
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(() => {
+      fetchData();
+    }, 400);
+
+    return () => clearTimeout(debounceRef.current);
+  }, [filters, isAuthenticated]);
 
   const handleSearch = (newFilters: any) => {
     setFilters(newFilters);
@@ -119,6 +129,7 @@ export default function Home() {
         `/api/v1/company/update/${updatedCompany.id}/`,
         updatedCompany
       );
+
       setCompanies((prev) =>
         prev.map((c) => (c.id === updatedCompany.id ? response.data : c))
       );
@@ -145,48 +156,43 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-
       <Header onSearch={handleSearch} />
 
-      <section className="companies-section py-16 md:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {loading ? (
-            <div className="text-center py-20 text-gray-600">Loading...</div>
-          ) : error ? (
-            <div className="text-center py-20 text-red-600 font-medium text-xl">
-              {error}
-            </div>
-          ) : companies.length === 0 ? (
+      <section className="py-16 md:py-20">
+        <div className="container mx-auto px-4">
+          {loading && <p className="text-center py-20">Loading...</p>}
+
+          {!loading && error && (
+            <p className="text-center py-20 text-red-600 text-xl">{error}</p>
+          )}
+
+          {!loading && !error && companies.length === 0 && (
             <div className="text-center py-20 text-gray-500 text-xl">
-              No companies found
-              <br />
-              <span className="text-lg">
-                Try changing the search term or filter.
-              </span>
+              No companies found <br />
+              <span className="text-lg">Try changing filters</span>
             </div>
-          ) : (
+          )}
+
+          {!loading && !error && companies.length > 0 && (
             <>
-              <p className="section-subtitle text-center text-lg font-medium text-gray-600 mb-10">
+              <p className="text-center mb-10 text-lg font-medium text-gray-600">
                 Found {companies.length} companies
               </p>
 
-              <div className="companies-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {companies.map((company) => (
-                  <div key={company.id}>
-                    <CompanyCard
-                      key={company.id}
-                      id={company.id}
-                      name={company.name}
-                      rating={company.rating}
-                      reviewText={company.reviewText}
-                      reviewerName={company.reviewerName}
-                      reviewerImage={company.reviewerImage}
-                      isAdmin={isAdmin}
-                      onViewDetails={() => navigate(`/company/${company.id}`)}
-                      onEdit={() => handleEditClick(company)}
-                      routeId={company.route?.id}
-                    />
-                  </div>
+                  <CompanyCard
+                    key={company.id}
+                    id={company.id}
+                    name={company.name}
+                    rating={company.rating}
+                    reviewText={company.reviewText}
+                    reviewerName={company.reviewerName}
+                    isAdmin={isAdmin}
+                    onViewDetails={() => navigate(`/company/${company.id}`)}
+                    onEdit={() => handleEditClick(company)}
+                    routeId={company.route?.id}
+                  />
                 ))}
               </div>
             </>

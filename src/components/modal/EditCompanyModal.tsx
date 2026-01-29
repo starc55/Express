@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
+import { FaPlus, FaTrash } from "react-icons/fa";
 import axiosInstance from "@/api/axiosInstance";
 import styles from "@/styles/modal/editCompanyModal.module.css";
+
+interface Route {
+  id?: number;
+  from_location: string;
+  to_location: string;
+  isNew?: boolean;
+  isDeleted?: boolean;
+}
 
 interface CompanyFormData {
   id: string | number;
@@ -25,9 +34,6 @@ interface CompanyFormData {
   route_description: string;
   status: "open" | "closed" | "";
   enclosed: string[];
-  routeId?: number;
-  from_location?: string;
-  to_location?: string;
 }
 
 interface EditCompanyModalProps {
@@ -65,12 +71,67 @@ export default function EditCompanyModal({
     route_description: "",
     status: "open",
     enclosed: [],
-    from_location: "",
-    to_location: "",
   });
 
+  const [routes, setRoutes] = useState<Route[]>([
+    { from_location: "", to_location: "", isNew: true },
+  ]);
   const [loading, setLoading] = useState(false);
+  const [loadingRoutes, setLoadingRoutes] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const locations = [
+    "Alabama",
+    "Alaska",
+    "Arizona",
+    "Arkansas",
+    "California",
+    "Colorado",
+    "Connecticut",
+    "Delaware",
+    "Florida",
+    "Georgia",
+    "Hawaii",
+    "Idaho",
+    "Illinois",
+    "Indiana",
+    "Iowa",
+    "Kansas",
+    "Kentucky",
+    "Louisiana",
+    "Maine",
+    "Maryland",
+    "Massachusetts",
+    "Michigan",
+    "Minnesota",
+    "Mississippi",
+    "Missouri",
+    "Montana",
+    "Nebraska",
+    "Nevada",
+    "New Hampshire",
+    "New Jersey",
+    "New Mexico",
+    "New York",
+    "North Carolina",
+    "North Dakota",
+    "Ohio",
+    "Oklahoma",
+    "Oregon",
+    "Pennsylvania",
+    "Rhode Island",
+    "South Carolina",
+    "South Dakota",
+    "Tennessee",
+    "Texas",
+    "Utah",
+    "Vermont",
+    "Virginia",
+    "Washington",
+    "West Virginia",
+    "Wisconsin",
+    "Wyoming",
+  ];
 
   useEffect(() => {
     if (company) {
@@ -81,13 +142,40 @@ export default function EditCompanyModal({
         insurance_deductible: company.insurance_deductible?.toString() || "",
         status: company.status || "open",
         enclosed: Array.isArray(company.enclosed) ? company.enclosed : [],
-        from_location: company.from_location || "",
-        to_location: company.to_location || "",
-        routeId: company.routeId,
       });
+
+      fetchCompanyRoutes(company.id);
     }
-    console.log("COMPANY DATA:", company);
   }, [company]);
+
+  const fetchCompanyRoutes = async (companyId: string | number) => {
+    setLoadingRoutes(true);
+    try {
+      const response = await axiosInstance.get("/api/v1/company-routes/", {
+        params: { company_id: companyId },
+      });
+
+      if (response.data && Array.isArray(response.data)) {
+        const existingRoutes = response.data.map((route: any) => ({
+          id: route.id,
+          from_location: route.from_location || "",
+          to_location: route.to_location || "",
+          isNew: false,
+        }));
+
+        if (existingRoutes.length > 0) {
+          setRoutes(existingRoutes);
+        } else {
+          setRoutes([{ from_location: "", to_location: "", isNew: true }]);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching routes:", err);
+      setRoutes([{ from_location: "", to_location: "", isNew: true }]);
+    } finally {
+      setLoadingRoutes(false);
+    }
+  };
 
   if (!isOpen || !company) return null;
 
@@ -112,6 +200,32 @@ export default function EditCompanyModal({
     const options = [...e.target.selectedOptions];
     const values = options.map((opt) => opt.value);
     setFormData((prev) => ({ ...prev, enclosed: values }));
+  };
+
+  const handleRouteChange = (
+    index: number,
+    field: "from_location" | "to_location",
+    value: string
+  ) => {
+    const updatedRoutes = [...routes];
+    updatedRoutes[index][field] = value;
+    setRoutes(updatedRoutes);
+  };
+
+  const addRoute = () => {
+    setRoutes([...routes, { from_location: "", to_location: "", isNew: true }]);
+  };
+
+  const removeRoute = (index: number) => {
+    const routeToRemove = routes[index];
+
+    if (routeToRemove.isNew) {
+      setRoutes(routes.filter((_, i) => i !== index));
+    } else {
+      const updatedRoutes = [...routes];
+      updatedRoutes[index].isDeleted = true;
+      setRoutes(updatedRoutes);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -149,16 +263,55 @@ export default function EditCompanyModal({
         companyPayload
       );
 
-      if (formData.routeId) {
-        const routePayload = {
-          company: Number(company.id),
-          from_location: formData.from_location?.trim() || null,
-          to_location: formData.to_location?.trim() || null,
-        };
+      const routesToDelete = routes.filter(
+        (route) => route.isDeleted && route.id
+      );
+      for (const route of routesToDelete) {
+        if (route.id) {
+          await axiosInstance.delete(
+            `/api/v1/company-route/delete/${route.id}/`
+          );
+        }
+      }
 
-        await axiosInstance.put(
-          `/api/v1/company-route/update/${formData.routeId}/`,
-          routePayload
+      const routesToUpdate = routes.filter(
+        (route) => !route.isNew && !route.isDeleted && route.id
+      );
+      for (const route of routesToUpdate) {
+        if (
+          route.id &&
+          route.from_location.trim() &&
+          route.to_location.trim()
+        ) {
+          await axiosInstance.put(`/api/v1/company-route/update/${route.id}/`, {
+            company: Number(company.id),
+            from_location: route.from_location.trim(),
+            to_location: route.to_location.trim(),
+          });
+        }
+      }
+
+      const newRoutes = routes.filter(
+        (route) =>
+          route.isNew &&
+          !route.isDeleted &&
+          route.from_location.trim() &&
+          route.to_location.trim()
+      );
+
+      if (newRoutes.length > 0) {
+        await axiosInstance.post(
+          "/api/v1/company-route/create/",
+          {
+            company_id: Number(company.id),
+            routes: newRoutes.map((route) => ({
+              from_location: route.from_location.trim(),
+              to_location: route.to_location.trim(),
+            })),
+          },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
         );
       }
 
@@ -190,6 +343,8 @@ export default function EditCompanyModal({
       setLoading(false);
     }
   };
+
+  const visibleRoutes = routes.filter((route) => !route.isDeleted);
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
@@ -277,6 +432,71 @@ export default function EditCompanyModal({
             </section>
 
             <section className={styles.section}>
+              <h3 className={styles.sectionTitle}>Insurance Information</h3>
+              <div className={styles.grid}>
+                <div>
+                  <label className={styles.label}>Insurance Company</label>
+                  <input
+                    type="text"
+                    name="insurance_company"
+                    value={formData.insurance_company}
+                    onChange={handleChange}
+                    placeholder="Insurance company"
+                    className={styles.input}
+                  />
+                </div>
+
+                <div>
+                  <label className={styles.label}>Insurance Agent</label>
+                  <input
+                    type="text"
+                    name="insurance_agent"
+                    value={formData.insurance_agent}
+                    onChange={handleChange}
+                    placeholder="Insurance agent"
+                    className={styles.input}
+                  />
+                </div>
+
+                <div>
+                  <label className={styles.label}>Insurance Phone</label>
+                  <input
+                    type="tel"
+                    name="insurance_phone"
+                    value={formData.insurance_phone}
+                    onChange={handleChange}
+                    placeholder="Insurance phone"
+                    className={styles.input}
+                  />
+                </div>
+
+                <div>
+                  <label className={styles.label}>Insurance Deductible</label>
+                  <input
+                    type="number"
+                    name="insurance_deductible"
+                    value={formData.insurance_deductible}
+                    onChange={handleChange}
+                    placeholder="Deductible amount"
+                    className={styles.input}
+                  />
+                </div>
+
+                <div>
+                  <label className={styles.label}>Physical Damage Limit</label>
+                  <input
+                    type="number"
+                    name="physical_damage_limit"
+                    value={formData.physical_damage_limit}
+                    onChange={handleChange}
+                    placeholder="Damage limit"
+                    className={styles.input}
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section className={styles.section}>
               <h3 className={styles.sectionTitle}>Equipment & Route</h3>
               <div className={styles.grid}>
                 <div>
@@ -296,25 +516,20 @@ export default function EditCompanyModal({
                 </div>
 
                 <div>
-                  <label className={`${styles.label} ${styles.required}`}>
-                    Equipment Description
-                  </label>
+                  <label className={styles.label}>Equipment Description</label>
                   <input
                     type="text"
                     name="equipment_description"
                     value={formData.equipment_description}
                     onChange={handleChange}
                     placeholder="Equipment description"
-                    required
                     className={styles.input}
                   />
                 </div>
               </div>
 
               <div className={styles.mt4}>
-                <label className={`${styles.label} ${styles.required}`}>
-                  Route Description
-                </label>
+                <label className={styles.label}>Route Description</label>
                 <textarea
                   name="route_description"
                   value={formData.route_description}
@@ -322,9 +537,80 @@ export default function EditCompanyModal({
                   placeholder="Route description"
                   className={styles.textarea}
                   rows={3}
-                  required
                 />
               </div>
+            </section>
+
+            <section className={styles.section}>
+              <h3 className={styles.sectionTitle}>Routes</h3>
+              {loadingRoutes ? (
+                <div className={styles.loadingText}>Loading routes...</div>
+              ) : (
+                <>
+                  {visibleRoutes.map((route, index) => (
+                    <div key={index} className={styles.routeRow}>
+                      <select
+                        title="From Location"
+                        value={route.from_location}
+                        onChange={(e) =>
+                          handleRouteChange(
+                            routes.indexOf(route),
+                            "from_location",
+                            e.target.value
+                          )
+                        }
+                        className={styles.select}
+                      >
+                        <option value="">From</option>
+                        {locations.map((loc) => (
+                          <option key={loc} value={loc}>
+                            {loc}
+                          </option>
+                        ))}
+                      </select>
+
+                      <select
+                        title="To Location"
+                        value={route.to_location}
+                        onChange={(e) =>
+                          handleRouteChange(
+                            routes.indexOf(route),
+                            "to_location",
+                            e.target.value
+                          )
+                        }
+                        className={styles.select}
+                      >
+                        <option value="">To</option>
+                        {locations.map((loc) => (
+                          <option key={loc} value={loc}>
+                            {loc}
+                          </option>
+                        ))}
+                      </select>
+
+                      {visibleRoutes.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeRoute(routes.indexOf(route))}
+                          className={styles.removeBtn}
+                          title="Remove route"
+                        >
+                          <FaTrash />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={addRoute}
+                    className={styles.addBtn}
+                  >
+                    <FaPlus /> Add Route
+                  </button>
+                </>
+              )}
             </section>
 
             <div className={styles.mt4}>
@@ -374,7 +660,7 @@ export default function EditCompanyModal({
                 className={styles.saveBtn}
                 disabled={loading}
               >
-                {loading ? "Saving..." : "Save"}
+                {loading ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </form>
