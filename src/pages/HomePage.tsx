@@ -160,7 +160,7 @@ export default function Home() {
 
       <section className="py-16 md:py-20">
         <div className="container mx-auto px-4">
-          {loading && <p className="text-center py-20">Loading...</p>}
+          {loading && <p className="text-center py-20">Login to view companies ...</p>}
 
           {!loading && error && (
             <p className="text-center py-20 text-red-600 text-xl">{error}</p>
