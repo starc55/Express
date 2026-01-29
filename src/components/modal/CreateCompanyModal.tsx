@@ -245,7 +245,13 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
         insuranceFormData.append("files", insuranceFile);
       }
 
-      await axiosInstance.post("/api/v1/insurance-details/", insuranceFormData);
+      await axiosInstance.post(
+        "/api/v1/insurance-details/",
+        insuranceFormData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       const validContacts = contacts.filter(
         (c) => c.name.trim() && c.email.trim() && c.phone.trim()
@@ -297,18 +303,21 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
           driverForm.append("files", file);
         });
 
-        await axiosInstance.post("/api/v1/driver/create/", driverForm);
+        await axiosInstance.post("/api/v1/driver/create/", driverForm, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       }
 
       if (additionalImages.length > 0) {
         const additionalForm = new FormData();
         additionalForm.append("company_id", String(companyId));
         additionalImages.forEach((file) => {
-          additionalForm.append("images", file);
+          additionalForm.append("files", file);
         });
         await axiosInstance.post(
           "/api/v1/additional-detail/create/",
-          additionalForm
+          additionalForm,
+          { headers: { "Content-Type": "multipart/form-data" } }
         );
       }
 
