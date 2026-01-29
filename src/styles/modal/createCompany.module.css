@@ -225,8 +225,8 @@
     background: #c2410c;
     color: white;
     border: none;
-    border-radius: 6px;
-    padding: 10px 16px;
+    border-radius: 20px;
+    padding: 1rem 16px;
     cursor: pointer;
     transition: background 0.2s ease;
 }

@@ -4,6 +4,8 @@ import axiosInstance from "@/api/axiosInstance";
 import styles from "@/styles/modal/createCompany.module.css";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { TbFileUpload } from "react-icons/tb";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface CreateCompanyModalProps {
   isOpen: boolean;
@@ -63,6 +65,7 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
   const [additionalImages, setAdditionalImages] = useState<File[]>([]);
   const [insuranceFile, setInsuranceFile] = useState<File | null>(null);
   const [selectedEnclosed, setSelectedEnclosed] = useState<string[]>([]);
+  const [insuranceExpirationDate, setInsuranceExpirationDate] = useState<Date | null>(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -223,11 +226,9 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
       insuranceFormData.append("agent", formData.insurance_agent);
       insuranceFormData.append("insurance_phone", formData.insurance_phone);
 
-      if (formData.insurance_expiration_date) {
-        insuranceFormData.append(
-          "expiration_date",
-          formData.insurance_expiration_date
-        );
+      if (insuranceExpirationDate) {
+        const formattedDate = insuranceExpirationDate.toISOString().split('T')[0];
+        insuranceFormData.append("expiration_date", formattedDate);
       }
       if (formData.insurance_deductible) {
         insuranceFormData.append(
@@ -695,17 +696,13 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
 
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Expiration Date</label>
-                <input
-                  title="Expiration Date"
-                  type="date"
-                  value={formData.insurance_expiration_date}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      insurance_expiration_date: e.target.value,
-                    })
-                  }
+                <DatePicker
+                  selected={insuranceExpirationDate}
+                  onChange={(date) => setInsuranceExpirationDate(date)}
+                  dateFormat="MM/dd/yyyy"
+                  placeholderText="Select expiration date"
                   className={styles.input}
+                  wrapperClassName={styles.datePickerWrapper}
                 />
               </div>
 
