@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { IoClose } from "react-icons/io5";
 import axiosInstance from "@/api/axiosInstance";
 import styles from "@/styles/modal/editCompanyModal.module.css";
@@ -37,9 +36,6 @@ interface EditCompanyModalProps {
   company: CompanyFormData | null;
   onSave: (data: CompanyFormData) => void;
 }
-
-const carrierOptions = ["interstate", "intrastate"];
-const authorityOptions = ["broker", "common", "contract"];
 
 export default function EditCompanyModal({
   isOpen,
@@ -90,6 +86,7 @@ export default function EditCompanyModal({
         routeId: company.routeId,
       });
     }
+    console.log("COMPANY DATA:", company);
   }, [company]);
 
   if (!isOpen || !company) return null;
@@ -195,240 +192,194 @@ export default function EditCompanyModal({
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className={styles.modalOverlay}
-            onClick={onClose}
-          />
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalInner}>
+          <div className={styles.header}>
+            <h2 className={styles.title}>Edit company information</h2>
+            <button
+              onClick={onClose}
+              className={styles.closeBtn}
+              aria-label="Close"
+            >
+              <IoClose />
+            </button>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: 30 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className={styles.modalContent}
-          >
-            <div className={styles.modalInner}>
-              <div className={styles.header}>
-                <h2 className={styles.title}>Edit company information</h2>
-                <button
-                  onClick={onClose}
-                  className={styles.closeBtn}
-                  aria-label="Close"
-                >
-                  <IoClose />
-                </button>
+          {error && <div className={styles.errorMsg}>{error}</div>}
+
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <section className={styles.section}>
+              <h3 className={styles.sectionTitle}>Basic Information</h3>
+              <div className={styles.grid}>
+                <div>
+                  <label className={`${styles.label} ${styles.required}`}>
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Company name"
+                    required
+                    className={styles.input}
+                  />
+                </div>
+
+                <div>
+                  <label className={`${styles.label} ${styles.required}`}>
+                    USDOT
+                  </label>
+                  <input
+                    type="text"
+                    name="usdot"
+                    value={formData.usdot}
+                    onChange={handleChange}
+                    placeholder="USDOT number"
+                    required
+                    className={styles.input}
+                  />
+                </div>
+
+                <div>
+                  <label className={styles.label}>MC Number</label>
+                  <input
+                    type="text"
+                    name="mc_number"
+                    value={formData.mc_number}
+                    onChange={handleChange}
+                    placeholder="MC number"
+                    className={styles.input}
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section className={styles.section}>
+              <h3 className={styles.sectionTitle}>Business Details</h3>
+              <div className={styles.grid}>
+                <div>
+                  <label className={`${styles.label} ${styles.required}`}>
+                    Business Address
+                  </label>
+                  <input
+                    type="text"
+                    name="business_address"
+                    value={formData.business_address}
+                    onChange={handleChange}
+                    placeholder="Business address"
+                    required
+                    className={styles.input}
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section className={styles.section}>
+              <h3 className={styles.sectionTitle}>Equipment & Route</h3>
+              <div className={styles.grid}>
+                <div>
+                  <label className={`${styles.label} ${styles.required}`}>
+                    # of Trucks
+                  </label>
+                  <input
+                    type="number"
+                    name="number_of_trucks"
+                    value={formData.number_of_trucks}
+                    onChange={handleChange}
+                    placeholder="Number of trucks"
+                    min="0"
+                    required
+                    className={styles.input}
+                  />
+                </div>
+
+                <div>
+                  <label className={`${styles.label} ${styles.required}`}>
+                    Equipment Description
+                  </label>
+                  <input
+                    type="text"
+                    name="equipment_description"
+                    value={formData.equipment_description}
+                    onChange={handleChange}
+                    placeholder="Equipment description"
+                    required
+                    className={styles.input}
+                  />
+                </div>
               </div>
 
-              {error && <div className={styles.errorMsg}>{error}</div>}
+              <div className={styles.mt4}>
+                <label className={`${styles.label} ${styles.required}`}>
+                  Route Description
+                </label>
+                <textarea
+                  name="route_description"
+                  value={formData.route_description}
+                  onChange={handleChange}
+                  placeholder="Route description"
+                  className={styles.textarea}
+                  rows={3}
+                  required
+                />
+              </div>
+            </section>
 
-              <form onSubmit={handleSubmit} className={styles.form}>
-                <section className={styles.section}>
-                  <h3 className={styles.sectionTitle}>Basic Information</h3>
-                  <div className={styles.grid}>
-                    <div>
-                      <label className={`${styles.label} ${styles.required}`}>
-                        Company Name
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="Company name"
-                        required
-                        className={styles.input}
-                      />
-                    </div>
-
-                    <div>
-                      <label className={`${styles.label} ${styles.required}`}>
-                        USDOT
-                      </label>
-                      <input
-                        type="text"
-                        name="usdot"
-                        value={formData.usdot}
-                        onChange={handleChange}
-                        placeholder="USDOT number"
-                        required
-                        className={styles.input}
-                      />
-                    </div>
-
-                    <div>
-                      <label className={styles.label}>MC Number</label>
-                      <input
-                        type="text"
-                        name="mc_number"
-                        value={formData.mc_number}
-                        onChange={handleChange}
-                        placeholder="MC number"
-                        className={styles.input}
-                      />
-                    </div>
-                  </div>
-                </section>
-
-                <section className={styles.section}>
-                  <h3 className={styles.sectionTitle}>Business Details</h3>
-                  <div className={styles.grid}>
-                    <div>
-                      <label className={`${styles.label} ${styles.required}`}>
-                        Business Address
-                      </label>
-                      <input
-                        type="text"
-                        name="business_address"
-                        value={formData.business_address}
-                        onChange={handleChange}
-                        placeholder="Business address"
-                        required
-                        className={styles.input}
-                      />
-                    </div>
-                  </div>
-                </section>
-
-                <section className={styles.section}>
-                  <h3 className={styles.sectionTitle}>Equipment & Route</h3>
-                  <div className={styles.grid}>
-                    <div>
-                      <label className={`${styles.label} ${styles.required}`}>
-                        # of Trucks
-                      </label>
-                      <input
-                        type="number"
-                        name="number_of_trucks"
-                        value={formData.number_of_trucks}
-                        onChange={handleChange}
-                        placeholder="Number of trucks"
-                        min="0"
-                        required
-                        className={styles.input}
-                      />
-                    </div>
-
-                    <div>
-                      <label className={`${styles.label} ${styles.required}`}>
-                        Equipment Description
-                      </label>
-                      <input
-                        type="text"
-                        name="equipment_description"
-                        value={formData.equipment_description}
-                        onChange={handleChange}
-                        placeholder="Equipment description"
-                        required
-                        className={styles.input}
-                      />
-                    </div>
-                  </div>
-
-                  <div className={styles.mt4}>
-                    <label className={`${styles.label} ${styles.required}`}>
-                      Route Description
-                    </label>
-                    <textarea
-                      name="route_description"
-                      value={formData.route_description}
-                      onChange={handleChange}
-                      placeholder="Route description"
-                      className={styles.textarea}
-                      rows={3}
-                      required
-                    />
-                  </div>
-                </section>
-
-                <div className={styles.mt4}>
-                  <label className={styles.label}>Status</label>
-                  <select
-                    title="Select Status"
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    className={styles.input}
-                  >
-                    <option value="open">Open</option>
-                    <option value="closed">Closed</option>
-                  </select>
-                </div>
-
-                <div className={styles.mt4}>
-                  <label className={styles.label}>
-                    Enclosed / Trailer Type
-                  </label>
-                  <select
-                    title="Select Enclosed / Trailer Type"
-                    multiple
-                    value={formData.enclosed}
-                    onChange={handleMultiSelectChange}
-                    className={`${styles.input} ${styles.multiSelect}`}
-                    size={5}
-                  >
-                    <option value="open">Open</option>
-                    <option value="enclosed">Enclosed</option>
-                    <option value="flatbed">Flatbed</option>
-                    <option value="inoperable">Inoperable</option>
-                    <option value="closed">Closed</option>
-                  </select>
-                  <small className={styles.helperText}>
-                    Hold Ctrl (or Cmd) to select multiple options
-                  </small>
-                </div>
-
-                <div className={styles.mt4}>
-                  <label className={styles.label}>From Location</label>
-                  <input
-                    type="text"
-                    name="from_location"
-                    value={formData.from_location || ""}
-                    onChange={handleChange}
-                    placeholder="From location"
-                    className={styles.input}
-                  />
-                </div>
-
-                <div className={styles.mt4}>
-                  <label className={styles.label}>To Location</label>
-                  <input
-                    type="text"
-                    name="to_location"
-                    value={formData.to_location || ""}
-                    onChange={handleChange}
-                    placeholder="To location"
-                    className={styles.input}
-                  />
-                </div>
-
-                <div className={styles.footer}>
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className={styles.cancelBtn}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className={styles.saveBtn}
-                    disabled={loading}
-                  >
-                    {loading ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </form>
+            <div className={styles.mt4}>
+              <label className={styles.label}>Status</label>
+              <select
+                title="Status"
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className={styles.input}
+              >
+                <option value="open">Open</option>
+                <option value="closed">Closed</option>
+              </select>
             </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+
+            <div className={styles.mt4}>
+              <label className={styles.label}>Enclosed</label>
+              <select
+                title="Type"
+                multiple
+                value={formData.enclosed}
+                onChange={handleMultiSelectChange}
+                className={`${styles.input} ${styles.multiSelect}`}
+                size={5}
+              >
+                <option value="open">Open</option>
+                <option value="enclosed">Enclosed</option>
+                <option value="flatbed">Flatbed</option>
+                <option value="inoperable">Inoperable</option>
+              </select>
+              <small className={styles.helperText}>
+                Hold Ctrl (or Cmd) to select multiple options
+              </small>
+            </div>
+
+            <div className={styles.footer}>
+              <button
+                type="button"
+                onClick={onClose}
+                className={styles.cancelBtn}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className={styles.saveBtn}
+                disabled={loading}
+              >
+                {loading ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }

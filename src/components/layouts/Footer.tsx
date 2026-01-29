@@ -1,50 +1,27 @@
 import React from "react";
-import { motion } from "framer-motion";
 import styles from "@/styles/layouts/footer.module.css";
 import logo from "@/assets/images/logo.svg";
 import { FiPhone } from "react-icons/fi";
 import { MdOutlineEmail } from "react-icons/md";
 import { IoLocationOutline } from "react-icons/io5";
-
-import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 import { FaInstagram, FaFacebookF, FaYoutube } from "react-icons/fa";
-
-const footerVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.2, ease: "easeOut", staggerChildren: 0.12 },
-  },
-} as const;
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 15 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
-};
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <motion.footer
-      className={styles.footer}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
-      variants={footerVariants}
-    >
+    <footer className={styles.footer}>
       <div className={styles.container}>
         <div className={styles.top}>
-          <motion.div className={styles.logoBlock} variants={itemVariants}>
+          <div className={styles.logoBlock}>
             <img
               src={logo}
               alt="Xpress Auto Transportation Logo"
               className={styles.logoImg}
             />
-          </motion.div>
+          </div>
 
-          <motion.div className={styles.contact} variants={itemVariants}>
+          <div className={styles.contact}>
             <div className={styles.contactItem}>
               <FiPhone className={styles.icon} />
               <a href="tel:+19295665040" className={styles.value}>
@@ -68,10 +45,10 @@ const Footer: React.FC = () => {
                 3073 Allendale Dr, Indian Land, SC 29707, USA
               </address>
             </div>
-          </motion.div>
+          </div>
         </div>
 
-        <motion.div className={styles.bottom} variants={itemVariants}>
+        <div className={styles.bottom}>
           <span className={styles.copyright}>
             © {currentYear} Xpress Auto Transportation Inc. All rights reserved.
           </span>
@@ -84,9 +61,9 @@ const Footer: React.FC = () => {
               Privacy Policy
             </a>
           </div>
-        </motion.div>
+        </div>
       </div>
-    </motion.footer>
+    </footer>
   );
 };
 

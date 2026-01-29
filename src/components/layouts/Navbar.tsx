@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/layouts/navbar.css";
 import logo from "@/assets/images/logo.svg";
 import { useNavigate } from "react-router-dom";
@@ -9,35 +8,6 @@ import { HiOutlineUserPlus, HiOutlineBuildingOffice } from "react-icons/hi2";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import CreateCompanyModal from "../modal/CreateCompanyModal";
 import AddEmployeeModal from "@/components/modal/AddEmployeeModal";
-
-const navVariants = {
-  hidden: { y: -100, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut" as const,
-      when: "beforeChildren",
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const childVariants = {
-  hidden: { opacity: 0, y: -20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: "easeOut" as const },
-  },
-};
-
-const buttonVariants = {
-  rest: { scale: 1 },
-  hover: { scale: 1.05, transition: { duration: 0.2 } },
-  tap: { scale: 0.97 },
-};
 
 const Navbar = () => {
   const [visible, setVisible] = useState(true);
@@ -71,15 +41,10 @@ const Navbar = () => {
 
   return (
     <>
-      <motion.nav
-        className={`navbar-container ${visible ? "visible" : "hidden"}`}
-        initial="hidden"
-        animate="visible"
-        variants={navVariants}
-      >
-        <motion.div className="navbar-logo" variants={childVariants}>
+      <nav className={`navbar-container ${visible ? "visible" : "hidden"}`}>
+        <div className="navbar-logo">
           <img src={logo} alt="Xpress logo" />
-        </motion.div>
+        </div>
 
         <p className="navigo">Navigo</p>
 
@@ -87,98 +52,78 @@ const Navbar = () => {
           {isAuthenticated ? (
             isAdmin ? (
               <div className="user-dropdown">
-                <motion.button
+                <button
                   type="button"
                   className="navbar-button user-button"
                   onClick={toggleDropdown}
-                  variants={buttonVariants}
-                  initial="rest"
-                  whileHover="hover"
-                  whileTap="tap"
                 >
                   Admin
                   <MdOutlineArrowDropDown size={20} />
-                </motion.button>
+                </button>
 
-                <AnimatePresence>
-                  {dropdownOpen && (
-                    <motion.div
-                      className="dropdown-menu"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
+                {dropdownOpen && (
+                  <div className="dropdown-menu">
+                    <button
+                      type="button"
+                      className="dropdown-item"
+                      onClick={() => {
+                        setIsAddModalOpen(true);
+                        setDropdownOpen(false);
+                      }}
                     >
-                      <button
-                        type="button"
-                        className="dropdown-item"
-                        onClick={() => {
-                          setIsAddModalOpen(true);
-                          setDropdownOpen(false);
-                        }}
-                      >
-                        <HiOutlineUserPlus size={20} />
-                        Add Employee
-                      </button>
-                      <button
-                        type="button"
-                        className="dropdown-item"
-                        onClick={() => {
-                          setIsCreateCompanyModalOpen(true);
-                          setDropdownOpen(false);
-                        }}
-                      >
-                        <HiOutlineBuildingOffice size={20} />
-                        Add Company
-                      </button>
+                      <HiOutlineUserPlus size={20} />
+                      Add Employee
+                    </button>
+                    <button
+                      type="button"
+                      className="dropdown-item"
+                      onClick={() => {
+                        setIsCreateCompanyModalOpen(true);
+                        setDropdownOpen(false);
+                      }}
+                    >
+                      <HiOutlineBuildingOffice size={20} />
+                      Add Company
+                    </button>
 
-                      <button
-                        type="button"
-                        className="dropdown-item logout"
-                        onClick={handleLogout}
-                      >
-                        <RiLogoutCircleLine size={20} />
-                        Log Out
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                    <button
+                      type="button"
+                      className="dropdown-item logout"
+                      onClick={handleLogout}
+                    >
+                      <RiLogoutCircleLine size={20} />
+                      Log Out
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
-              <motion.button
+              <button
                 type="button"
                 className="navbar-button logout-button"
                 onClick={handleLogout}
-                variants={buttonVariants}
-                initial="rest"
-                whileHover="hover"
-                whileTap="tap"
               >
                 <RiLogoutCircleLine size={20} style={{ marginRight: "8px" }} />
                 Log Out
-              </motion.button>
+              </button>
             )
           ) : (
-            <motion.button
+            <button
               type="button"
               className="navbar-button"
               onClick={() => navigate("/login")}
-              variants={buttonVariants}
-              initial="rest"
-              whileHover="hover"
-              whileTap="tap"
             >
               Login
-            </motion.button>
+            </button>
           )}
         </div>
-      </motion.nav>
+      </nav>
 
       <AddEmployeeModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSave={(data) => {
-          console.log("New employee added::", data);
+          console.log("New employee added:", data);
         }}
       />
       <CreateCompanyModal
@@ -186,6 +131,10 @@ const Navbar = () => {
         onClose={() => setIsCreateCompanyModalOpen(false)}
         onSuccess={() => {
           console.log("Company created!");
+          setIsCreateCompanyModalOpen(false);
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
         }}
       />
     </>

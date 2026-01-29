@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/layouts/Navbar";
 import Header from "./Header";
@@ -8,25 +7,6 @@ import Footer from "@/components/layouts/Footer";
 import EditCompanyModal from "@/components/modal/EditCompanyModal";
 import axiosInstance from "@/api/axiosInstance";
 import { useAuth } from "@/context/AuthContext";
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.3 },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 60, scale: 0.2 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.1, ease: "easeOut" as const },
-  },
-  hover: { scale: 1.01, y: -3, transition: { duration: 0.1 } },
-};
 
 export default function Home() {
   const navigate = useNavigate();
@@ -99,11 +79,14 @@ export default function Home() {
           );
         })[0];
 
+        const route = company.route || null;
+
         return {
           ...company,
           rating,
           reviewText: latestReview?.comment || "",
           reviewerName: latestReview?.reviewer_name || "",
+          route,
         };
       });
 
@@ -112,7 +95,6 @@ export default function Home() {
       if (enhancedCompanies.length === 0) {
         setError("No companies found");
       }
-      console.log("Fetched companies:", enhancedCompanies);
     } catch (err: any) {
       console.error("Error fetching data:", err);
       setError("Please login to view companies.");
@@ -164,13 +146,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <motion.div
-        initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: "easeOut" }}
-      >
-        <Header onSearch={handleSearch} />
-      </motion.div>
+      <Header onSearch={handleSearch} />
 
       <section className="companies-section py-16 md:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -190,43 +166,29 @@ export default function Home() {
             </div>
           ) : (
             <>
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                className="section-subtitle text-center text-lg font-medium text-gray-600 mb-10"
-              >
+              <p className="section-subtitle text-center text-lg font-medium text-gray-600 mb-10">
                 Found {companies.length} companies
-              </motion.p>
+              </p>
 
-              <motion.div
-                className="companies-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-              >
+              <div className="companies-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {companies.map((company) => (
-                  <motion.div
-                    key={company.id}
-                    variants={cardVariants}
-                    whileHover="hover"
-                  >
+                  <div key={company.id}>
                     <CompanyCard
+                      key={company.id}
                       id={company.id}
                       name={company.name}
                       rating={company.rating}
-                      city={company.city || "N/A"}
-                      state={company.state || "N/A"}
                       reviewText={company.reviewText}
-                      reviewerName={company.reviewer_name}
+                      reviewerName={company.reviewerName}
                       reviewerImage={company.reviewerImage}
                       isAdmin={isAdmin}
                       onViewDetails={() => navigate(`/company/${company.id}`)}
                       onEdit={() => handleEditClick(company)}
+                      routeId={company.route?.id}
                     />
-                  </motion.div>
+                  </div>
                 ))}
-              </motion.div>
+              </div>
             </>
           )}
         </div>

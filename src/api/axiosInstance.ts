@@ -5,7 +5,7 @@ const API_BASE = "https://backendcarrier.xpresstransportation.org/";
 const axiosInstance = axios.create({
   baseURL: API_BASE,
   headers: {
-    "Content-Type": "application/json",
+    Accept: "application/json",
   },
   timeout: 15000,
 });

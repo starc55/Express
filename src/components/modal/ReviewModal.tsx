@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { CiStar } from "react-icons/ci";
-import { motion } from "framer-motion";
-import toast from "react-hot-toast";
-
-import styles from "@/styles/modal/reviewModal.module.css";
 import axiosInstance from "@/api/axiosInstance";
+import styles from "@/styles/modal/reviewModal.module.css";
 
 interface ReviewModalProps {
   companyName: string;
@@ -27,30 +24,6 @@ interface FormData {
   company: number;
 }
 
-const modalVariants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.3, ease: "easeOut" },
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.8,
-    transition: { duration: 0.3, ease: "easeOut" },
-  },
-} as const;
-
-const backdropVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3 } },
-};
-
-const buttonVariants = {
-  hover: { scale: 1.05, transition: { duration: 0.2 } },
-  tap: { scale: 0.95 },
-};
-
 const StarRating: React.FC<{
   name: string;
   value: number;
@@ -59,17 +32,14 @@ const StarRating: React.FC<{
   return (
     <div className={styles.starRating}>
       {[...Array(5)].map((_, i) => (
-        <motion.span
-          key={i}
-          whileHover={{ scale: 1.2 }}
-          transition={{ duration: 0.2 }}
-        >
+        <span key={i}>
           <CiStar
             size={24}
             className={i < value ? styles.filledStar : styles.emptyStar}
             onClick={() => onChange(name, i + 1)}
+            style={{ cursor: "pointer" }}
           />
-        </motion.span>
+        </span>
       ))}
     </div>
   );
@@ -116,16 +86,11 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
     if (isSubmitting) return;
     setIsSubmitting(true);
 
-    const loadingToast = toast.loading("Submitting review...");
-
     try {
       const response = await axiosInstance.post("/api/v1/reviews/", formData);
 
       if (response.status >= 200 && response.status < 300) {
-        toast.success("Review submitted successfully!", {
-          id: loadingToast,
-          duration: 5000,
-        });
+        alert("Review submitted successfully!");
 
         setFormData({
           reviewer_name: "",
@@ -142,11 +107,9 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
 
         setTimeout(() => {
           onClose();
-        }, 1800);
+        }, 1500);
       } else {
-        toast.error("Failed to submit review. Please try again.", {
-          id: loadingToast,
-        });
+        alert("Failed to submit review. Please try again.");
       }
     } catch (err: any) {
       console.error("Review submission error:", err);
@@ -165,7 +128,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
         errorMsg = err.message;
       }
 
-      toast.error(errorMsg, { id: loadingToast });
+      alert(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -174,29 +137,15 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
   if (!isOpen) return null;
 
   return createPortal(
-    <motion.div
-      className={styles.modalOverlay}
-      variants={backdropVariants}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
-      onClick={onClose}
-    >
-      <motion.div
-        className={styles.modalContent}
-        variants={modalVariants}
-        initial="hidden"
-        animate="visible"
-        exit="hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <h2 className={styles.modalTitle}>Submit Review for {companyName}</h2>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>
             <label className={styles.label}>Your Name:</label>
             <input
-              title="name"
+              title="Name"
               type="text"
               name="reviewer_name"
               value={formData.reviewer_name}
@@ -288,7 +237,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
           <div className={styles.formGroup}>
             <label className={styles.label}>Comment:</label>
             <textarea
-              title="comment"
+              title="Comment"
               name="comment"
               value={formData.comment}
               onChange={handleChange}
@@ -299,32 +248,26 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
           </div>
 
           <div className={styles.buttonGroup}>
-            <motion.button
+            <button
               type="submit"
               className={styles.submitButton}
-              variants={buttonVariants}
-              whileHover="hover"
-              whileTap="tap"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Submitting..." : "Submit Review"}
-            </motion.button>
+            </button>
 
-            <motion.button
+            <button
               type="button"
               className={styles.closeButton}
               onClick={onClose}
-              variants={buttonVariants}
-              whileHover="hover"
-              whileTap="tap"
               disabled={isSubmitting}
             >
               Close
-            </motion.button>
+            </button>
           </div>
         </form>
-      </motion.div>
-    </motion.div>,
+      </div>
+    </div>,
     document.body
   );
 };

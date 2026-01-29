@@ -525,3 +525,14 @@
     font-weight: 600;
     color: #333;
 }
+
+.inputError {
+    border-color: #ff4d4f !important;
+    background-color: #fff2f0;
+}
+
+.errorText {
+    color: #ff4d4f;
+    font-size: 0.82rem;
+    margin-top: 4px;
+}

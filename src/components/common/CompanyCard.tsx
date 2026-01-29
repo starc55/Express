@@ -16,6 +16,8 @@ interface CompanyCardProps {
   isAdmin?: boolean;
   onViewDetails: (id: string | number) => void;
   onEdit?: (id: string | number) => void;
+  route?: { from_location: string; to_location: string };
+  routeId?: number;
 }
 
 interface Route {
@@ -27,47 +29,47 @@ const CompanyCard: React.FC<CompanyCardProps> = ({
   id,
   name,
   rating,
-  city = "",
-  state = "",
   reviewText,
   reviewerImage,
   reviewerName,
   isAdmin = false,
   onViewDetails,
   onEdit,
+  route,
+  routeId,
 }) => {
-  const [routes, setRoutes] = useState<Route[]>([]);
+  const [fetchedRoute, setFetchedRoute] = useState<Route | null>(null);
   const [loadingRoute, setLoadingRoute] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchRoute = async () => {
-      try {
-        const res = await axiosInstance.get(`/api/v1/company-route/${id}`);
-        if (res.data && !Array.isArray(res.data)) {
-          setRoutes([res.data]);
-        } else if (Array.isArray(res.data)) {
-          setRoutes(res.data);
+      if (routeId) {
+        try {
+          const res = await axiosInstance.get(
+            `/api/v1/company-route/${routeId}/`
+          );
+          setFetchedRoute(res.data);
+        } catch (err) {
+          console.warn("Company route not loaded:", err);
+          setFetchedRoute(null);
+        } finally {
+          setLoadingRoute(false);
         }
-      } catch (err) {
-        console.warn("Company route not loaded:", err);
-        setRoutes([]);
-      } finally {
+      } else {
         setLoadingRoute(false);
       }
     };
-
     fetchRoute();
-  }, [id]);
+  }, [routeId]);
 
-  const primaryRoute = routes[0];
   const routeText = loadingRoute
     ? "Loading route..."
-    : primaryRoute
-    ? `${primaryRoute.from_location} → ${primaryRoute.to_location}`
-    : city && state
-    ? `${city}, ${state}`
-    : "N/A";
+    : fetchedRoute
+    ? `${fetchedRoute.from_location} → ${fetchedRoute.to_location}`
+    : route
+    ? `${route.from_location} → ${route.to_location}`
+    : "Route not available";
 
   return (
     <div className={styles.card}>

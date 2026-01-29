@@ -8,80 +8,8 @@ import {
   BsEnvelope,
 } from "react-icons/bs";
 import Footer from "@/components/layouts/Footer";
-import { motion } from "framer-motion";
-import toast from "react-hot-toast";
 import axiosInstance from "@/api/axiosInstance";
 import styles from "@/styles/common/companyDetail.module.css";
-
-const pageVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: "easeOut" as const },
-  },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 1 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.14,
-      delayChildren: 0.2,
-    },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 40, scale: 0.96 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.65, ease: "easeOut" as const },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" as const },
-  },
-};
-
-const starVariants = {
-  hidden: { opacity: 0, scale: 0.6 },
-  visible: (i: number) => ({
-    opacity: 1,
-    scale: 1,
-    transition: {
-      delay: i * 0.08,
-      type: "spring" as const,
-      stiffness: 280,
-      damping: 14,
-    },
-  }),
-};
-
-const barVariants = {
-  hidden: { width: 0 },
-  visible: (percent: number) => ({
-    width: `${percent}%`,
-    transition: { duration: 1.2, ease: "easeOut" as const },
-  }),
-};
-
-const checkVariants = {
-  hidden: { scale: 0, opacity: 0 },
-  visible: {
-    scale: 1,
-    opacity: 1,
-    transition: { type: "spring" as const, stiffness: 300, damping: 20 },
-  },
-};
 
 export default function CompanyDetail() {
   const { id } = useParams();
@@ -98,20 +26,18 @@ export default function CompanyDetail() {
     const fetchData = async () => {
       if (!id) return;
 
-      const loadingToast = toast.loading("Loading company details...");
-
       setLoading(true);
       setError(null);
 
       try {
+        const MIN_VISIBLE_TIME = 400;
+        const startTime = Date.now();
         const companyRes = await axiosInstance.get(
           `/api/v1/company/detail/${id}/`
         );
         const companyData = companyRes.data;
         setCompany(companyData);
-
-        const companyContacts = companyData.contacts || [];
-        setContacts(companyContacts);
+        setContacts(companyData.contacts || []);
 
         try {
           const insuranceRes = await axiosInstance.get(
@@ -124,26 +50,19 @@ export default function CompanyDetail() {
             insuranceRes.data.results || insuranceRes.data || [];
           setInsurance(insuranceData.length > 0 ? insuranceData[0] : null);
         } catch (insErr) {
-          console.warn(
-            "Insurance not loaded, using company data fallback",
-            insErr
-          );
+          console.warn("Insurance not loaded", insErr);
           setInsurance(null);
         }
 
-        const reviewsRes = await axiosInstance.get("/api/v1/reviews/", {
-          params: {
-            company: id,
-            page_size: 50,
-            ordering: "-created_at",
-          },
-        });
-        setReviews(reviewsRes.data.results || reviewsRes.data || []);
-
-        toast.success("Loaded successfully", { id: loadingToast });
+        const reviewsRes = await axiosInstance.get(
+          `/api/v1/review/detail/${id}/`
+        );
+        const reviewsData = reviewsRes.data.results || reviewsRes.data || [];
+        const elapsed = Date.now() - startTime;
+        const remaining = MIN_VISIBLE_TIME - elapsed;
+        setReviews(reviewsData);
       } catch (err: any) {
         console.error("Error loading data:", err);
-        toast.error("Failed to load company details", { id: loadingToast });
         setError("Company details could not be loaded. Please try again.");
       } finally {
         setLoading(false);
@@ -160,37 +79,25 @@ export default function CompanyDetail() {
     try {
       await axiosInstance.delete(`/api/v1/contact/delete/${contactId}/`);
       setContacts((prev) => prev.filter((c) => c.id !== contactId));
-      toast.success("Contact deleted successfully");
+      alert("Contact deleted successfully");
     } catch (err) {
       console.error("Delete contact error:", err);
-      toast.error("Failed to delete contact");
+      alert("Failed to delete contact");
     }
   };
 
   if (loading) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className={styles.loading}
-      >
-        Loading...
-      </motion.div>
-    );
+    return <div className={styles.loading}>Loading company details...</div>;
   }
 
   if (error || !company) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className={styles.notFound}
-      >
+      <div className={styles.notFound}>
         <h2>404 - Company not found</h2>
         <button type="button" onClick={() => navigate("/")}>
           Back to home
         </button>
-      </motion.div>
+      </div>
     );
   }
 
@@ -239,60 +146,31 @@ export default function CompanyDetail() {
     if (typeof rating === "string") return <span>N/A</span>;
 
     return [...Array(5)].map((_, i) => (
-      <motion.div
+      <CiStar
         key={i}
-        custom={i}
-        variants={starVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <CiStar
-          size={24}
-          className={
-            i < Math.floor(Number(rating))
-              ? styles.starFilled
-              : styles.starEmpty
-          }
-        />
-      </motion.div>
+        size={24}
+        className={
+          i < Math.floor(Number(rating)) ? styles.starFilled : styles.starEmpty
+        }
+      />
     ));
   };
 
   return (
-    <motion.div
-      className={styles.pageWrapper}
-      variants={pageVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <div className={styles.pageWrapper}>
       <main className={styles.main}>
         <div className={styles.container}>
-          <motion.button
+          <button
             type="button"
             className={styles.backButton}
             onClick={() => navigate(-1)}
-            whileHover={{ scale: 1.04, x: -4 }}
-            whileTap={{ scale: 0.96 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
             Back
-          </motion.button>
+          </button>
 
-          <motion.h1
-            className={styles.pageTitle}
-            variants={itemVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {company.name}
-          </motion.h1>
+          <h1 className={styles.pageTitle}>{company.name}</h1>
 
-          <motion.div
-            className={styles.ratingCard}
-            variants={cardVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <div className={styles.ratingCard}>
             <div className={styles.overallSection}>
               <p className={styles.overallLabel}>Overall Rating Average</p>
               <div className={styles.overallNumber}>{overallRating}</div>
@@ -305,18 +183,15 @@ export default function CompanyDetail() {
             </div>
 
             <div className={styles.barSection}>
-              {([5, 4, 3, 2, 1] as const).map((stars) => {
+              {[5, 4, 3, 2, 1].map((stars) => {
                 const widths = [95, 4, 1, 0, 0];
                 return (
                   <div key={stars} className={styles.barRow}>
                     <span>{stars}</span>
                     <div className={styles.bar}>
-                      <motion.div
+                      <div
                         className={styles.barFill}
-                        custom={widths[5 - stars]}
-                        variants={barVariants}
-                        initial="hidden"
-                        animate="visible"
+                        style={{ width: `${widths[5 - stars]}%` }}
                       />
                     </div>
                   </div>
@@ -327,59 +202,35 @@ export default function CompanyDetail() {
             <div className={styles.detailSection}>
               <p className={styles.detailLabel}>Avg. Detail Rating</p>
 
-              <motion.div
-                className={styles.detailRatingsGrid}
-                variants={staggerContainer}
-                initial="hidden"
-                animate="visible"
-              >
+              <div className={styles.detailRatingsGrid}>
                 {[
                   { label: "Timeliness", value: avgTimeliness },
                   { label: "Communication", value: avgCommunication },
                   { label: "Documentation", value: avgDocumentation },
                 ].map((item) => (
-                  <motion.div
-                    key={item.label}
-                    className={styles.detailItem}
-                    variants={itemVariants}
-                  >
+                  <div key={item.label} className={styles.detailItem}>
                     <span className={styles.detailLabelText}>{item.label}</span>
                     <div className={styles.starWithNumber}>
                       <span className={styles.starIcon}>★</span>
                       <span className={styles.starNumber}>{item.value}</span>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
-              </motion.div>
+              </div>
 
-              <motion.div
-                className={styles.statsList}
-                variants={staggerContainer}
-                initial="hidden"
-                animate="visible"
-              >
-                <motion.p variants={itemVariants}>
-                  {paymentsMet}% Payments terms met
-                </motion.p>
-                <motion.p variants={itemVariants}>
-                  {wouldWorkAgain}% Would work again
-                </motion.p>
-                <motion.p variants={itemVariants}>
+              <div className={styles.statsList}>
+                <p>{paymentsMet}% Payments terms met</p>
+                <p>{wouldWorkAgain}% Would work again</p>
+                <p>
                   {vehicleCondition}% Vehicle delivered in expected conditions
-                </motion.p>
-              </motion.div>
+                </p>
+              </div>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            className={styles.infoGrid}
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-          >
-            <motion.div className={styles.infoCard} variants={cardVariants}>
+          <div className={styles.infoGrid}>
+            <div className={styles.infoCard}>
               <h3 className={styles.cardTitle}>FMCSA Verification Checklist</h3>
-
               <div className={styles.checklistGrid}>
                 {[
                   {
@@ -409,34 +260,18 @@ export default function CompanyDetail() {
                     value: company.carrier_operation || "N/A",
                   },
                 ].map((item) => (
-                  <motion.div
-                    key={item.label}
-                    className={styles.gridItem}
-                    variants={itemVariants}
-                  >
+                  <div key={item.label} className={styles.gridItem}>
                     <div className={styles.checkLabel}>{item.label}</div>
                     <div className={styles.checkValue}>
-                      <motion.div
-                        variants={checkVariants}
-                        initial="hidden"
-                        animate="visible"
-                      >
-                        <BsCheckCircle className={styles.checkIcon} size={18} />
-                      </motion.div>
+                      <BsCheckCircle className={styles.checkIcon} size={18} />
                       <span>{item.value}</span>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
 
                 <div className={styles.authorityRow}>
                   <div className={styles.checkLabelFull}>
-                    <motion.div
-                      variants={checkVariants}
-                      initial="hidden"
-                      animate="visible"
-                    >
-                      <BsCheckCircle className={styles.checkIcon} size={18} />
-                    </motion.div>
+                    <BsCheckCircle className={styles.checkIcon} size={18} />
                     Authority Status
                   </div>
                   <div className={styles.authorityTags}>
@@ -446,9 +281,9 @@ export default function CompanyDetail() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div className={styles.infoCard} variants={cardVariants}>
+            <div className={styles.infoCard}>
               <h3 className={styles.cardTitle}>Cargo Insurance</h3>
               <div className={styles.cargoList}>
                 {[
@@ -494,19 +329,15 @@ export default function CompanyDetail() {
                       "-",
                   },
                 ].map((item) => (
-                  <motion.div
-                    key={item.label}
-                    className={styles.cargoItem}
-                    variants={itemVariants}
-                  >
+                  <div key={item.label} className={styles.cargoItem}>
                     <span className={styles.checkLabel}>{item.label}</span>
                     <span className={styles.checkValue}>{item.value}</span>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div className={styles.infoCard} variants={cardVariants}>
+            <div className={styles.infoCard}>
               <h3 className={styles.cardTitle}>Equipment & Route</h3>
               <div className={styles.routeList}>
                 {[
@@ -523,30 +354,22 @@ export default function CompanyDetail() {
                     value: company.route_description || "--",
                   },
                 ].map((item) => (
-                  <motion.div
-                    key={item.label}
-                    className={styles.routeItem}
-                    variants={itemVariants}
-                  >
+                  <div key={item.label} className={styles.routeItem}>
                     <span className={styles.checkLabel}>{item.label}</span>
                     <span className={styles.checkValue}>{item.value}</span>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div className={styles.infoCard} variants={cardVariants}>
+            <div className={styles.infoCard}>
               <h3 className={styles.cardTitle}>Contacts</h3>
               {contacts.length === 0 ? (
                 <p className={styles.noData}>No contacts available</p>
               ) : (
                 <div className={styles.contactList}>
                   {contacts.map((contact: any) => (
-                    <motion.div
-                      key={contact.id}
-                      className={styles.contactItem}
-                      variants={itemVariants}
-                    >
+                    <div key={contact.id} className={styles.contactItem}>
                       <div className={styles.contactInfo}>
                         <div className={styles.contactName}>
                           <strong>{contact.name || "Unnamed"}</strong>
@@ -567,30 +390,21 @@ export default function CompanyDetail() {
                       >
                         <BsTrash size={18} />
                       </button>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               )}
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
-          <motion.div
-            className={styles.reviewsSection}
-            variants={cardVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <div className={styles.reviewsSection}>
             <h2 className={styles.sectionTitle}>Reviews</h2>
 
             {reviews.length === 0 ? (
               <p className={styles.noReviews}>No reviews yet</p>
             ) : (
               reviews.map((review: any) => (
-                <motion.div
-                  key={review.id}
-                  className={styles.reviewCard}
-                  variants={itemVariants}
-                >
+                <div key={review.id} className={styles.reviewCard}>
                   <div className={styles.reviewHeader}>
                     <div className={styles.reviewerInfo}>
                       <div className={styles.reviewerAvatar}>
@@ -631,14 +445,14 @@ export default function CompanyDetail() {
                       as expected
                     </span>
                   </div>
-                </motion.div>
+                </div>
               ))
             )}
-          </motion.div>
+          </div>
         </div>
       </main>
 
       <Footer />
-    </motion.div>
+    </div>
   );
 }
