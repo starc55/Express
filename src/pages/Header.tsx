@@ -1,5 +1,6 @@
 import React from "react";
 import { CiSearch, CiLocationOn } from "react-icons/ci";
+import { MdLocalShipping } from "react-icons/md";
 import styles from "@/styles/pages/Header.module.css";
 
 interface HeaderProps {
@@ -8,17 +9,77 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onSearch }) => {
   const [name, setName] = React.useState("");
-  const [usdot, setUsdot] = React.useState("");
-  const [mc_number, setMcNumber] = React.useState("");
-  const [business_address, setBusinessAddress] = React.useState("");
+  const [fromLocation, setFromLocation] = React.useState("");
+  const [toLocation, setToLocation] = React.useState("");
+  const [enclosed, setEnclosed] = React.useState("");
+
+  const locations = [
+    "Alabama",
+    "Alaska",
+    "Arizona",
+    "Arkansas",
+    "California",
+    "Colorado",
+    "Connecticut",
+    "Delaware",
+    "Florida",
+    "Georgia",
+    "Hawaii",
+    "Idaho",
+    "Illinois",
+    "Indiana",
+    "Iowa",
+    "Kansas",
+    "Kentucky",
+    "Louisiana",
+    "Maine",
+    "Maryland",
+    "Massachusetts",
+    "Michigan",
+    "Minnesota",
+    "Mississippi",
+    "Missouri",
+    "Montana",
+    "Nebraska",
+    "Nevada",
+    "New Hampshire",
+    "New Jersey",
+    "New Mexico",
+    "New York",
+    "North Carolina",
+    "North Dakota",
+    "Ohio",
+    "Oklahoma",
+    "Oregon",
+    "Pennsylvania",
+    "Rhode Island",
+    "South Carolina",
+    "South Dakota",
+    "Tennessee",
+    "Texas",
+    "Utah",
+    "Vermont",
+    "Virginia",
+    "Washington",
+    "West Virginia",
+    "Wisconsin",
+    "Wyoming",
+  ];
+
+  const enclosedOptions = [
+    { value: "open", label: "Open" },
+    { value: "enclosed", label: "Enclosed" },
+    { value: "flatbed", label: "Flatbed" },
+    { value: "inoperable", label: "Inoperable" },
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch({
       name: name.trim(),
-      usdot: usdot.trim(),
-      mc_number: mc_number.trim(),
-      business_address: business_address.trim(),
+      from_location: fromLocation,
+      to_location: toLocation,
+      enclosed: enclosed,
     });
   };
 
@@ -41,44 +102,62 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
           </div>
 
           <div className={styles.inputWrapper}>
-            <label className={styles.fieldLabel}>USDOT</label>
+            <label className={styles.fieldLabel}>From Location</label>
             <div className={styles.inputGroup}>
-              <input
-                type="text"
-                placeholder="USDOT number"
-                value={usdot}
-                onChange={(e) => setUsdot(e.target.value)}
-                className={styles.input}
-              />
-              <CiSearch className={styles.searchIcon} size={20} />
-            </div>
-          </div>
-
-          <div className={styles.inputWrapper}>
-            <label className={styles.fieldLabel}>MC Number</label>
-            <div className={styles.inputGroup}>
-              <input
-                type="text"
-                placeholder="MC number"
-                value={mc_number}
-                onChange={(e) => setMcNumber(e.target.value)}
-                className={styles.input}
-              />
-              <CiSearch className={styles.searchIcon} size={20} />
-            </div>
-          </div>
-
-          <div className={styles.inputWrapper}>
-            <label className={styles.fieldLabel}>Business Address</label>
-            <div className={styles.inputGroup}>
-              <input
-                type="text"
-                placeholder="City, State or Address"
-                value={business_address}
-                onChange={(e) => setBusinessAddress(e.target.value)}
-                className={styles.input}
-              />
+              <select
+                title="From Location"
+                value={fromLocation}
+                onChange={(e) => setFromLocation(e.target.value)}
+                className={styles.select}
+              >
+                <option value=""></option>
+                {locations.map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
+                  </option>
+                ))}
+              </select>
               <CiLocationOn className={styles.searchIcon} size={20} />
+            </div>
+          </div>
+
+          <div className={styles.inputWrapper}>
+            <label className={styles.fieldLabel}>To Location</label>
+            <div className={styles.inputGroup}>
+              <select
+                title="To Location"
+                value={toLocation}
+                onChange={(e) => setToLocation(e.target.value)}
+                className={styles.select}
+              >
+                <option value=""></option>
+                {locations.map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
+                  </option>
+                ))}
+              </select>
+              <CiLocationOn className={styles.searchIcon} size={20} />
+            </div>
+          </div>
+
+          <div className={styles.inputWrapper}>
+            <label className={styles.fieldLabel}>Enclosed</label>
+            <div className={styles.inputGroup}>
+              <select
+                title="Enclosed Type"
+                value={enclosed}
+                onChange={(e) => setEnclosed(e.target.value)}
+                className={styles.select}
+              >
+                <option value=""></option>
+                {enclosedOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <MdLocalShipping className={styles.searchIcon} size={20} />
             </div>
           </div>
 

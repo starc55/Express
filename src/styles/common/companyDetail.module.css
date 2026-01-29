@@ -11,14 +11,14 @@
     max-width: 1200px;
     margin: 0 auto;
 }
-.loading{
+
+.loading {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 60vh;
     color: #555555;
     font-size: 1.2rem;
-    
 }
 
 .backButton {
@@ -666,5 +666,171 @@
 
     .statsList {
         font-size: 0.85rem;
+    }
+}
+
+.filesSection {
+    margin: 3rem 0;
+}
+
+.fileCard {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.fileCardTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.noFiles {
+    color: #6b7280;
+    font-style: italic;
+    padding: 1rem 0;
+}
+
+.filesList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.fileItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.fileItem:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.fileInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.fileInfo>svg {
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.fileDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.fileName {
+    font-weight: 500;
+    color: #111827;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fileDate {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.fileActions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.fileActionBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.fileActionBtn:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #fff;
+}
+
+.fileActionBtn:active {
+    transform: scale(0.95);
+}
+
+.driversList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.driverSection {
+    border-left: 3px solid #ef4444;
+    padding-left: 1rem;
+}
+
+.driverHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.driverName {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.driverPhone {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .fileItem {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .fileActions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .fileInfo {
+        width: 100%;
+    }
+
+    .driverHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
 }

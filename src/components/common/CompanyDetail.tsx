@@ -6,6 +6,9 @@ import {
   BsTrash,
   BsTelephone,
   BsEnvelope,
+  BsDownload,
+  BsEye,
+  BsFileEarmark,
 } from "react-icons/bs";
 import Footer from "@/components/layouts/Footer";
 import axiosInstance from "@/api/axiosInstance";
@@ -19,6 +22,9 @@ export default function CompanyDetail() {
   const [insurance, setInsurance] = useState<any>(null);
   const [contacts, setContacts] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [additionalDetails, setAdditionalDetails] = useState<any>(null);
+  const [drivers, setDrivers] = useState<any[]>([]);
+  const [routes, setRoutes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,6 +60,36 @@ export default function CompanyDetail() {
           setInsurance(null);
         }
 
+        try {
+          const additionalRes = await axiosInstance.get(
+            `/api/v1/additional-detail/${id}/`
+          );
+          setAdditionalDetails(additionalRes.data);
+        } catch (addErr) {
+          console.warn("Additional details not loaded", addErr);
+          setAdditionalDetails(null);
+        }
+
+        try {
+          const driversRes = await axiosInstance.get(`/api/v1/driver/${id}/`);
+          const driversData = driversRes.data.results || driversRes.data || [];
+          setDrivers(Array.isArray(driversData) ? driversData : []);
+        } catch (drvErr) {
+          console.warn("Drivers not loaded", drvErr);
+          setDrivers([]);
+        }
+
+        try {
+          const routesRes = await axiosInstance.get(
+            `/api/v1/company-route/${id}/`
+          );
+          const routesData = routesRes.data.results || routesRes.data || [];
+          setRoutes(Array.isArray(routesData) ? routesData : []);
+        } catch (routeErr) {
+          console.warn("Routes not loaded", routeErr);
+          setRoutes([]);
+        }
+
         const reviewsRes = await axiosInstance.get(
           `/api/v1/review/detail/${id}/`
         );
@@ -84,6 +120,34 @@ export default function CompanyDetail() {
       console.error("Delete contact error:", err);
       alert("Failed to delete contact");
     }
+  };
+
+  const handleDownloadFile = async (fileUrl: string, fileName: string) => {
+    try {
+      const response = await axiosInstance.get(fileUrl, {
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download error:", err);
+      alert("Failed to download file");
+    }
+  };
+
+  const handleViewFile = (fileUrl: string) => {
+    window.open(fileUrl, "_blank");
+  };
+
+  const getFileNameFromUrl = (url: string) => {
+    const parts = url.split("/");
+    return parts[parts.length - 1] || "file";
   };
 
   if (loading) {
@@ -154,6 +218,62 @@ export default function CompanyDetail() {
         }
       />
     ));
+  };
+
+  const getLocationLabel = (location: string) => {
+    const locationMap: { [key: string]: string } = {
+      Alabama: "Alabama",
+      Alaska: "Alaska",
+      Arizona: "Arizona",
+      Arkansas: "Arkansas",
+      California: "California",
+      Colorado: "Colorado",
+      Connecticut: "Connecticut",
+      Delaware: "Delaware",
+      Florida: "Florida",
+      Georgia: "Georgia",
+      Hawaii: "Hawaii",
+      Idaho: "Idaho",
+      Illinois: "Illinois",
+      Indiana: "Indiana",
+      Iowa: "Iowa",
+      Kansas: "Kansas",
+      Kentucky: "Kentucky",
+      Louisiana: "Louisiana",
+      Maine: "Maine",
+      Maryland: "Maryland",
+      Massachusetts: "Massachusetts",
+      Michigan: "Michigan",
+      Minnesota: "Minnesota",
+      Mississippi: "Mississippi",
+      Missouri: "Missouri",
+      Montana: "Montana",
+      Nebraska: "Nebraska",
+      Nevada: "Nevada",
+      "New Hampshire": "New Hampshire",
+      "New Jersey": "New Jersey",
+      "New Mexico": "New Mexico",
+      "New York": "New York",
+      "North Carolina": "North Carolina",
+      "North Dakota": "North Dakota",
+      Ohio: "Ohio",
+      Oklahoma: "Oklahoma",
+      Oregon: "Oregon",
+      Pennsylvania: "Pennsylvania",
+      "Rhode Island": "Rhode Island",
+      "South Carolina": "South Carolina",
+      "South Dakota": "South Dakota",
+      Tennessee: "Tennessee",
+      Texas: "Texas",
+      Utah: "Utah",
+      Vermont: "Vermont",
+      Virginia: "Virginia",
+      Washington: "Washington",
+      "West Virginia": "West Virginia",
+      Wisconsin: "Wisconsin",
+      Wyoming: "Wyoming",
+    };
+    return locationMap[location] || location;
   };
 
   return (
@@ -233,18 +353,6 @@ export default function CompanyDetail() {
               <h3 className={styles.cardTitle}>FMCSA Verification Checklist</h3>
               <div className={styles.checklistGrid}>
                 {[
-                  {
-                    label: "Allowed to operate",
-                    value: company.allowed_to_operate ? "Yes" : "No",
-                  },
-                  {
-                    label: "Business type",
-                    value: company.business_type || "N/A",
-                  },
-                  {
-                    label: "MCS 150 Outdated",
-                    value: company.mcs_150_outdated ? "Yes" : "No",
-                  },
                   { label: "USDOT#", value: company.usdot || "N/A" },
                   {
                     label: "Business Address",
@@ -268,18 +376,6 @@ export default function CompanyDetail() {
                     </div>
                   </div>
                 ))}
-
-                <div className={styles.authorityRow}>
-                  <div className={styles.checkLabelFull}>
-                    <BsCheckCircle className={styles.checkIcon} size={18} />
-                    Authority Status
-                  </div>
-                  <div className={styles.authorityTags}>
-                    <span className={styles.tag}>
-                      {company.authority_status || "N/A"}
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -338,7 +434,7 @@ export default function CompanyDetail() {
             </div>
 
             <div className={styles.infoCard}>
-              <h3 className={styles.cardTitle}>Equipment & Route</h3>
+              <h3 className={styles.cardTitle}>Equipment</h3>
               <div className={styles.routeList}>
                 {[
                   {
@@ -349,10 +445,6 @@ export default function CompanyDetail() {
                     label: "Equipment Description",
                     value: company.equipment_description || "--",
                   },
-                  {
-                    label: "Route Description",
-                    value: company.route_description || "--",
-                  },
                 ].map((item) => (
                   <div key={item.label} className={styles.routeItem}>
                     <span className={styles.checkLabel}>{item.label}</span>
@@ -360,6 +452,27 @@ export default function CompanyDetail() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            <div className={styles.infoCard}>
+              <h3 className={styles.cardTitle}>Routes</h3>
+              {routes.length === 0 ? (
+                <p className={styles.noData}>No routes available</p>
+              ) : (
+                <div className={styles.routeList}>
+                  {routes.map((route: any, index: number) => (
+                    <div key={route.id} className={styles.routeItem}>
+                      <span className={styles.checkLabel}>
+                        Route {index + 1}
+                      </span>
+                      <span className={styles.checkValue}>
+                        {getLocationLabel(route.from_location)} →{" "}
+                        {getLocationLabel(route.to_location)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className={styles.infoCard}>
@@ -390,6 +503,185 @@ export default function CompanyDetail() {
                       >
                         <BsTrash size={18} />
                       </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className={styles.filesSection}>
+            <h2 className={styles.sectionTitle}>Company Files</h2>
+
+            <div className={styles.fileCard}>
+              <h3 className={styles.fileCardTitle}>
+                <BsFileEarmark size={20} />
+                Additional Details Files
+              </h3>
+              {!additionalDetails || additionalDetails.files?.length === 0 ? (
+                <p className={styles.noFiles}>No additional files available</p>
+              ) : (
+                <div className={styles.filesList}>
+                  {additionalDetails.files.map((file: any) => (
+                    <div key={file.id} className={styles.fileItem}>
+                      <div className={styles.fileInfo}>
+                        <BsFileEarmark size={18} />
+                        <div className={styles.fileDetails}>
+                          <span className={styles.fileName}>
+                            {getFileNameFromUrl(file.file)}
+                          </span>
+                          <span className={styles.fileDate}>
+                            {new Date(file.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className={styles.fileActions}>
+                        <button
+                          type="button"
+                          onClick={() => handleViewFile(file.file)}
+                          className={styles.fileActionBtn}
+                          title="View file"
+                        >
+                          <BsEye size={18} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleDownloadFile(
+                              file.file,
+                              getFileNameFromUrl(file.file)
+                            )
+                          }
+                          className={styles.fileActionBtn}
+                          title="Download file"
+                        >
+                          <BsDownload size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className={styles.fileCard}>
+              <h3 className={styles.fileCardTitle}>
+                <BsFileEarmark size={20} />
+                Insurance Files
+              </h3>
+              {!insurance || insurance.files?.length === 0 ? (
+                <p className={styles.noFiles}>No insurance files available</p>
+              ) : (
+                <div className={styles.filesList}>
+                  {insurance.files.map((file: any) => (
+                    <div key={file.id} className={styles.fileItem}>
+                      <div className={styles.fileInfo}>
+                        <BsFileEarmark size={18} />
+                        <div className={styles.fileDetails}>
+                          <span className={styles.fileName}>
+                            {getFileNameFromUrl(file.file)}
+                          </span>
+                          <span className={styles.fileDate}>
+                            {new Date(file.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className={styles.fileActions}>
+                        <button
+                          type="button"
+                          onClick={() => handleViewFile(file.file)}
+                          className={styles.fileActionBtn}
+                          title="View file"
+                        >
+                          <BsEye size={18} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleDownloadFile(
+                              file.file,
+                              getFileNameFromUrl(file.file)
+                            )
+                          }
+                          className={styles.fileActionBtn}
+                          title="Download file"
+                        >
+                          <BsDownload size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className={styles.fileCard}>
+              <h3 className={styles.fileCardTitle}>
+                <BsFileEarmark size={20} />
+                Driver License Files
+              </h3>
+              {drivers.length === 0 ? (
+                <p className={styles.noFiles}>No driver files available</p>
+              ) : (
+                <div className={styles.driversList}>
+                  {drivers.map((driver: any) => (
+                    <div key={driver.id} className={styles.driverSection}>
+                      <div className={styles.driverHeader}>
+                        <h4 className={styles.driverName}>
+                          {driver.name || "Unnamed Driver"}
+                        </h4>
+                        <span className={styles.driverPhone}>
+                          {driver.phone || "No phone"}
+                        </span>
+                      </div>
+                      {driver.license_files?.length === 0 ? (
+                        <p className={styles.noFiles}>
+                          No license files for this driver
+                        </p>
+                      ) : (
+                        <div className={styles.filesList}>
+                          {driver.license_files.map((file: any) => (
+                            <div key={file.id} className={styles.fileItem}>
+                              <div className={styles.fileInfo}>
+                                <BsFileEarmark size={18} />
+                                <div className={styles.fileDetails}>
+                                  <span className={styles.fileName}>
+                                    {getFileNameFromUrl(file.file)}
+                                  </span>
+                                  <span className={styles.fileDate}>
+                                    {new Date(
+                                      file.created_at
+                                    ).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className={styles.fileActions}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleViewFile(file.file)}
+                                  className={styles.fileActionBtn}
+                                  title="View file"
+                                >
+                                  <BsEye size={18} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleDownloadFile(
+                                      file.file,
+                                      getFileNameFromUrl(file.file)
+                                    )
+                                  }
+                                  className={styles.fileActionBtn}
+                                  title="Download file"
+                                >
+                                  <BsDownload size={18} />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -451,7 +743,6 @@ export default function CompanyDetail() {
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );
