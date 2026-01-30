@@ -65,7 +65,8 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
   const [additionalImages, setAdditionalImages] = useState<File[]>([]);
   const [insuranceFile, setInsuranceFile] = useState<File | null>(null);
   const [selectedEnclosed, setSelectedEnclosed] = useState<string[]>([]);
-  const [insuranceExpirationDate, setInsuranceExpirationDate] = useState<Date | null>(null);
+  const [insuranceExpirationDate, setInsuranceExpirationDate] =
+    useState<Date | null>(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -227,7 +228,9 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
       insuranceFormData.append("insurance_phone", formData.insurance_phone);
 
       if (insuranceExpirationDate) {
-        const formattedDate = insuranceExpirationDate.toISOString().split('T')[0];
+        const formattedDate = insuranceExpirationDate
+          .toISOString()
+          .split("T")[0];
         insuranceFormData.append("expiration_date", formattedDate);
       }
       if (formData.insurance_deductible) {

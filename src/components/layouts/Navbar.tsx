@@ -46,7 +46,7 @@ const Navbar = () => {
           <img src={logo} alt="Xpress logo" />
         </div>
 
-        <p className="navigo">Navigo</p>
+        {/* <p className="navigo">Navigo</p> */}
 
         <div className="navbar-right">
           {isAuthenticated ? (
@@ -113,7 +113,7 @@ const Navbar = () => {
               className="navbar-button"
               onClick={() => navigate("/login")}
             >
-              Login
+              Dashboard
             </button>
           )}
         </div>

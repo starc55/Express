@@ -1,0 +1,97 @@
+.formTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.5rem;
+}
+
+.formDescription {
+    font-size: 1rem;
+    color: #6b7280;
+    margin-bottom: 2.5rem;
+}
+
+.guestFormWrapper {
+    margin-top: 4rem;
+}
+
+.formGroup {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.25rem;
+}
+
+.formGroup label {
+    position: absolute;
+    top: -0.5rem;
+    left: 1rem;
+    background-color: #f9fafb;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #717680;
+    margin-bottom: 0.5rem;
+}
+
+.formGroup input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #111827;
+    background-color: #f9fafb;
+    transition: all 0.2s ease;
+}
+
+.formGroup input:focus {
+    outline: none;
+    border-color: #ea580c;
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(251, 146, 60, 0.1);
+}
+
+.formGroup input:invalid:not(:placeholder-shown) {
+    border-color: #ef4444;
+    background-color: #fef2f2;
+}
+
+.formNote {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.submitButton {
+    width: 100%;
+    padding: 0.85rem;
+    background-color: #ff4e00;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.submitButton:hover {
+    background-color: #e04300;
+}
+
+@media (max-width: 480px) {
+    .driverOrderModal {
+        padding: 1.5rem 1.25rem;
+        margin: 12px;
+        border-radius: 10px;
+    }
+
+    .modalTitle {
+        font-size: 1.45rem;
+    }
+
+    .submitBtn {
+        padding: 0.85rem;
+        font-size: 1rem;
+    }
+}

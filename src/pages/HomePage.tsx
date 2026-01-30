@@ -7,6 +7,7 @@ import Footer from "@/components/layouts/Footer";
 import EditCompanyModal from "@/components/modal/EditCompanyModal";
 import axiosInstance from "@/api/axiosInstance";
 import { useAuth } from "@/context/AuthContext";
+import styles from "../styles/pages/Home.module.css";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -34,8 +35,51 @@ export default function Home() {
   const [selectedCompany, setSelectedCompany] = useState<any>(null);
 
   const fetchedOnceRef = useRef(false);
+  const debounceRef = useRef<number | null>(null);
 
-  const debounceRef = useRef<any>(null);
+  const [driverOrderForm, setDriverOrderForm] = useState({
+    company_name: "",
+    contact_name: "",
+    contact_email: "",
+    contact_phone: "",
+    pickup_time: "",
+    drop_off_time: "",
+    order_id: "",
+  });
+
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setDriverOrderForm((prev) => ({
+      ...prev,
+      [name]: name === "order_id" ? value : value,
+    }));
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const payload = {
+      ...driverOrderForm,
+      order_id: Number(driverOrderForm.order_id) || 0,
+    };
+
+    try {
+      await axiosInstance.post("/api/v1/driver-order/create/", payload);
+      alert("Order created successfully!");
+      setDriverOrderForm({
+        company_name: "",
+        contact_name: "",
+        contact_email: "",
+        contact_phone: "",
+        pickup_time: "",
+        drop_off_time: "",
+        order_id: "",
+      });
+    } catch (err: any) {
+      console.error("Driver order error:", err);
+      alert("An error occurred. Please check the data and try again.");
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -96,21 +140,22 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (!isAuthenticated) return;
-
-    if (!fetchedOnceRef.current) {
-      fetchedOnceRef.current = true;
-      fetchData();
-      return;
+    if (isAuthenticated) {
+      if (!fetchedOnceRef.current) {
+        fetchedOnceRef.current = true;
+        fetchData();
+      } else {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(fetchData, 400);
+      }
+    } else {
+      setLoading(false);
+      setError(null);
     }
 
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    debounceRef.current = setTimeout(() => {
-      fetchData();
-    }, 400);
-
-    return () => clearTimeout(debounceRef.current);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [filters, isAuthenticated]);
 
   const handleSearch = (newFilters: any) => {
@@ -156,45 +201,168 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <Header onSearch={handleSearch} />
+
+      {isAuthenticated && <Header onSearch={handleSearch} />}
 
       <section className="py-16 md:py-20">
         <div className="container mx-auto px-4">
-          {loading && <p className="text-center py-20">Login to view companies ...</p>}
-
-          {!loading && error && (
-            <p className="text-center py-20 text-red-600 text-xl">{error}</p>
+          {loading && (
+            <p className="text-center py-20 text-gray-600">
+              Loading companies...
+            </p>
           )}
 
-          {!loading && !error && companies.length === 0 && (
-            <div className="text-center py-20 text-gray-500 text-xl">
-              No companies found <br />
-              <span className="text-lg">Try changing filters</span>
+          {!isAuthenticated && !loading && (
+            <div className={styles.guestFormWrapper}>
+              <h2 className={styles.formTitle}>Create Driver Order</h2>
+
+              <p className={styles.formDescription}>
+                Please fill in the following information
+              </p>
+
+              <form
+                onSubmit={handleFormSubmit}
+                className={styles.driverOrderForm}
+              >
+                <div className={styles.formGroup}>
+                  <label>Order ID</label>
+                  <input
+                    type="number"
+                    name="order_id"
+                    value={driverOrderForm.order_id}
+                    onChange={handleFormChange}
+                    placeholder="123456"
+                    required
+                    min="1"
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>Company Name</label>
+                  <input
+                    type="text"
+                    name="company_name"
+                    value={driverOrderForm.company_name}
+                    onChange={handleFormChange}
+                    placeholder="e.g. ABC Logistics"
+                    required
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>Contact Name</label>
+                  <input
+                    type="text"
+                    name="contact_name"
+                    value={driverOrderForm.contact_name}
+                    onChange={handleFormChange}
+                    placeholder="e.g. John Doe"
+                    required
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    name="contact_email"
+                    value={driverOrderForm.contact_email}
+                    onChange={handleFormChange}
+                    placeholder="john@example.com"
+                    required
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>Phone Number</label>
+                  <input
+                    type="tel"
+                    name="contact_phone"
+                    value={driverOrderForm.contact_phone}
+                    onChange={handleFormChange}
+                    placeholder="+998901234567"
+                    required
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>Pickup Time</label>
+                  <input
+                    type="text"
+                    name="pickup_time"
+                    value={driverOrderForm.pickup_time}
+                    onChange={handleFormChange}
+                    placeholder="2025-10-15 14:30"
+                    required
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>Drop-off Time</label>
+                  <input
+                    type="text"
+                    name="drop_off_time"
+                    value={driverOrderForm.drop_off_time}
+                    onChange={handleFormChange}
+                    placeholder="2025-10-16 09:00"
+                    required
+                  />
+                </div>
+
+                <button type="submit" className={styles.submitButton}>
+                  Submit Order
+                </button>
+              </form>
+
+              <p className={styles.formNote}>
+                After logging in, you will be able to view the list of companies
+              </p>
             </div>
           )}
 
-          {!loading && !error && companies.length > 0 && (
+          {isAuthenticated && (
             <>
-              <p className="section-subtitle">
-                Found {companies.length} companies
-              </p>
+              {loading && (
+                <p className="text-center py-20">Loading companies...</p>
+              )}
 
-              <div className="companies-grid">
-                {companies.map((company) => (
-                  <CompanyCard
-                    key={company.id}
-                    id={company.id}
-                    name={company.name}
-                    rating={company.rating}
-                    reviewText={company.reviewText}
-                    reviewerName={company.reviewerName}
-                    isAdmin={isAdmin}
-                    onViewDetails={() => navigate(`/company/${company.id}`)}
-                    onEdit={() => handleEditClick(company)}
-                    routeId={company.route?.id}
-                  />
-                ))}
-              </div>
+              {!loading && error && (
+                <p className="text-center py-20 text-red-600 text-xl">
+                  {error}
+                </p>
+              )}
+
+              {!loading && !error && companies.length === 0 && (
+                <div className="text-center py-20 text-gray-500 text-xl">
+                  No companies found <br />
+                  <span className="text-lg">Try changing filters</span>
+                </div>
+              )}
+
+              {!loading && !error && companies.length > 0 && (
+                <>
+                  <p className="section-subtitle text-center mb-8">
+                    Found {companies.length} companies
+                  </p>
+
+                  <div className="companies-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {companies.map((company) => (
+                      <CompanyCard
+                        key={company.id}
+                        id={company.id}
+                        name={company.name}
+                        rating={company.rating}
+                        reviewText={company.reviewText}
+                        reviewerName={company.reviewerName}
+                        isAdmin={isAdmin}
+                        onViewDetails={() => navigate(`/company/${company.id}`)}
+                        onEdit={() => handleEditClick(company)}
+                        routeId={company.route?.id}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>
